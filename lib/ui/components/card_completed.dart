@@ -1,27 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../screen06_completed_breakdown.dart';
 import '../screen07_completed_preventive.dart';
 
 
 class CardCompletedTask extends StatefulWidget {
-  final String subtaskNumber;
+  final String swoNumber;
   final String equipmentNo;
   final String taskType;
   final String dept;
   final String startDate;
   final String endDate;
   final String assignedDate;
+  final int selectedIndex;
 
   const CardCompletedTask({
     super.key,
-    this.subtaskNumber = '',
+    this.swoNumber = '',
     this.equipmentNo = '',
     this.taskType = '',
     this.dept = '',
     this.startDate = '',
     this.endDate = '',
     this.assignedDate = '',
+    required this.selectedIndex,
   });
 
   @override
@@ -29,17 +32,38 @@ class CardCompletedTask extends StatefulWidget {
 }
 
 class _CardCompletedTaskState extends State<CardCompletedTask> {
+
+  String formatDateOnly(String? dateTimeString) {
+    if (dateTimeString == null || dateTimeString.isEmpty) return '';
+
+    try {
+      // Parse the date with the format: dd-MM-yyyy HH:mm:ss
+      DateTime dateTime = DateFormat('dd-MM-yyyy HH:mm:ss').parse(dateTimeString);
+      // Return only the date in dd/MM/yyyy format
+      return DateFormat('dd/MM/yyyy').format(dateTime);
+    } catch (e) {
+      // If parsing fails, try to extract just the date part (before the space)
+      if (dateTimeString.contains(' ')) {
+        return dateTimeString.split(' ')[0].replaceAll('-', '/');
+      }
+      return dateTimeString;
+    }
+  }
+
   void _navigateToTaskScreen(BuildContext context) {
     if (widget.taskType == 'BD') {
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => CompletedTaskBD(
+            /*
             subtaskNumber: widget.subtaskNumber,
             taskType: widget.taskType,
             equipmentNo: widget.equipmentNo,
             assignedDate: widget.assignedDate,
             dept: widget.dept,
+            */
+            selectedIndex: widget.selectedIndex,
           ),
         ),
       );
@@ -48,11 +72,14 @@ class _CardCompletedTaskState extends State<CardCompletedTask> {
         context,
         MaterialPageRoute(
           builder: (context) => CompletedTaskPM(
+            /*
             subtaskNumber: widget.subtaskNumber,
             taskType: widget.taskType,
             equipmentNo: widget.equipmentNo,
             assignedDate: widget.assignedDate,
             dept: widget.dept,
+            */
+            selectedIndex: widget.selectedIndex,
           ),
         ),
       );
@@ -83,7 +110,7 @@ class _CardCompletedTaskState extends State<CardCompletedTask> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.subtaskNumber,
+                          widget.swoNumber,
                           style: const TextStyle(
                             fontSize: 16,
                             fontFamily: 'Poppins',
@@ -161,7 +188,7 @@ class _CardCompletedTaskState extends State<CardCompletedTask> {
                           ),
                         ),
                         Text(
-                          widget.startDate,
+                          formatDateOnly(widget.startDate),
                           style: const TextStyle(
                             fontSize: 14,
                             color: Colors.green,
@@ -182,7 +209,7 @@ class _CardCompletedTaskState extends State<CardCompletedTask> {
                           ),
                         ),
                         Text(
-                          widget.endDate,
+                          formatDateOnly(widget.endDate),
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,

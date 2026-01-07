@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class SparePartIssuesScreen extends StatefulWidget {
-  final String subtaskNumber;
+  final String swoNumber;
   final String taskType;
   final List<Map<String, dynamic>> spareParts;
 
   const SparePartIssuesScreen({
-    required this.subtaskNumber,
+    required this.swoNumber,
     required this.taskType,
     required this.spareParts,
     super.key,
@@ -41,7 +41,7 @@ class _SparePartIssuesScreenState extends State<SparePartIssuesScreen> {
               ),
             ),
             Text(
-              widget.subtaskNumber,
+              widget.swoNumber,
               style: const TextStyle(
                 color: Color(0xFF94A3B8),
                 fontSize: 13,

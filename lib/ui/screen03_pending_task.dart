@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../app_data.dart';
 import 'components/card_in_progress.dart';
 
 class PendingTaskScreen extends StatefulWidget {
-  const PendingTaskScreen({super.key});
+
+  Function saveTasks;
+  Function refreshTask;
+
+
+  PendingTaskScreen({
+    super.key,
+    required this.saveTasks,
+    required this.refreshTask
+  });
 
   @override
   State<PendingTaskScreen> createState() => _PendingTaskScreenState();
@@ -73,6 +83,12 @@ class _PendingTaskScreenState extends State<PendingTaskScreen> {
       'pauseReason': 'Safety Check',
     },
   ];
+
+  refreshList(){
+    setState(() {
+      myTask.length;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -187,20 +203,28 @@ class _PendingTaskScreenState extends State<PendingTaskScreen> {
                   child: ListView.builder(
                     padding: EdgeInsets.zero,
                     shrinkWrap: true,
-                    itemCount: dummyInProgressTasks.length,
+                    itemCount: myTask.length,
                     itemBuilder: (context, index) {
-                      return CardInProgress(
-                        swoNumber: dummyInProgressTasks[index]['swoNumber'] ?? '',
-                        taskType: dummyInProgressTasks[index]['taskType'] ?? '',
-                        dept: dummyInProgressTasks[index]['dept'] ?? '',
-                        equipmentId: dummyInProgressTasks[index]['equipmentId'] ?? '',
-                        date: dummyInProgressTasks[index]['date'] ?? '',
-                        equipmentNo: dummyInProgressTasks[index]['equipmentNo'] ?? '',
-                        timeStart: dummyInProgressTasks[index]['timeStart'] ?? '',
-                        duration: dummyInProgressTasks[index]['duration'] ?? '',
-                        pauseTime: dummyInProgressTasks[index]['pauseTime'] ?? '',
-                        pauseReason: dummyInProgressTasks[index]['pauseReason'] ?? '',
-                      );
+                      if(myTask[index].status == "In Progress" || myTask[index].status == "Paused"){
+                        return CardInProgress(
+                          swoNumber: myTask[index].swoNumber ?? '',
+                          taskType: myTask[index].taskType ?? '',
+                          dept: myTask[index].dept ?? '',
+                          equipmentId: myTask[index].equipmentId ?? '',
+                          date: myTask[index].assignedDate ?? '',
+                          equipmentNo: myTask[index].equipmentId ?? '',
+                          timeStart: myTask[index].timeStart ?? '',
+                          duration: myTask[index].duration ?? '',
+                          pauseTime: myTask[index].pauseTime ?? '',
+                          pauseReason: myTask[index].pauseReason ?? '',
+                          selectedIndex: index,
+                          saveTasks: widget.saveTasks,
+                          refreshList: refreshList,
+                        );
+                      }else{
+                        return SizedBox();
+                      }
+
                     },
                   ),
                 ),

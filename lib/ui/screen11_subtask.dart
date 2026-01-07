@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class SubtaskServiceChecklist extends StatefulWidget {
-  final String subtaskName;
+  final String swoNumber;
   final String taskType;
   final VoidCallback onComplete;
 
   const SubtaskServiceChecklist({
     super.key,
-    required this.subtaskName,
+    required this.swoNumber,
     required this.taskType,
     required this.onComplete,
   });
@@ -51,7 +51,7 @@ class _SubtaskServiceChecklistState extends State<SubtaskServiceChecklist> {
               ),
             ),
             Text(
-              widget.subtaskName,
+              widget.swoNumber,
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

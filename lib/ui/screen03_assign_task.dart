@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 
+import '../app_data.dart';
 import 'components/card_assigned_task.dart';
 
 class AssignedTaskScreen extends StatefulWidget {
-  const AssignedTaskScreen({super.key});
+
+  Function saveTasks;
+  Function refreshTask;
+
+  AssignedTaskScreen({
+    super.key,
+    required this.saveTasks,
+    required this.refreshTask
+  });
 
   @override
   State<AssignedTaskScreen> createState() => _AssignedTaskScreenState();
@@ -11,43 +20,55 @@ class AssignedTaskScreen extends StatefulWidget {
 
 class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
   // Dummy data for assigned tasks
-  List<Map<String, String>> dummyTasks = [
-    {
-      'subtaskNumber': 'SWO-2024-001',
-      'taskType': 'BD',
-      'equipmentNo': 'EQ-12345',
-      'assignedDate': '2025-12-17',
-      'dept': 'EE',
-    },
-    {
-      'subtaskNumber': 'SWO-2024-002',
-      'taskType': 'PM',
-      'equipmentNo': 'EQ-67890',
-      'assignedDate': '2025-12-16',
-      'dept': 'ME',
-    },
-    {
-      'subtaskNumber': 'SWO-2024-003',
-      'taskType': 'BD',
-      'equipmentNo': 'EQ-11111',
-      'assignedDate': '2025-12-15',
-      'dept': 'EE',
-    },
-    {
-      'subtaskNumber': 'SWO-2024-004',
-      'taskType': 'PM',
-      'equipmentNo': 'EQ-22222',
-      'assignedDate': '2025-12-14',
-      'dept': 'ME',
-    },
-    {
-      'subtaskNumber': 'SWO-2024-005',
-      'taskType': 'BD',
-      'equipmentNo': 'EQ-33333',
-      'assignedDate': '2025-12-13',
-      'dept': 'EE',
-    },
-  ];
+  // List<Map<String, String>> dummyTasks = [
+  //   {
+  //     'subtaskNumber': 'SWO-2024-001',
+  //     'taskType': 'BD',
+  //     'equipmentNo': 'EQ-12345',
+  //     'assignedDate': '2025-12-17',
+  //     'dept': 'EE',
+  //   },
+  //   {
+  //     'subtaskNumber': 'SWO-2024-002',
+  //     'taskType': 'PM',
+  //     'equipmentNo': 'EQ-67890',
+  //     'assignedDate': '2025-12-16',
+  //     'dept': 'ME',
+  //   },
+  //   {
+  //     'subtaskNumber': 'SWO-2024-003',
+  //     'taskType': 'BD',
+  //     'equipmentNo': 'EQ-11111',
+  //     'assignedDate': '2025-12-15',
+  //     'dept': 'EE',
+  //   },
+  //   {
+  //     'subtaskNumber': 'SWO-2024-004',
+  //     'taskType': 'PM',
+  //     'equipmentNo': 'EQ-22222',
+  //     'assignedDate': '2025-12-14',
+  //     'dept': 'ME',
+  //   },
+  //   {
+  //     'subtaskNumber': 'SWO-2024-005',
+  //     'taskType': 'BD',
+  //     'equipmentNo': 'EQ-33333',
+  //     'assignedDate': '2025-12-13',
+  //     'dept': 'EE',
+  //   },
+  // ];
+
+  @override
+  void initState() {
+    print("ListSize: ${myTask.length}");
+    super.initState();
+  }
+
+  refreshList(){
+    setState(() {
+      myTask.length;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +104,7 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
                               color: Colors.white,
                             ),
                             onPressed: () {
+                              widget.refreshTask();
                               Navigator.pop(context);
                             },
                           ),
@@ -162,15 +184,23 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
                   child: ListView.builder(
                     padding: EdgeInsets.zero,
                     shrinkWrap: true,
-                    itemCount: dummyTasks.length,
+                    itemCount: myTask.length,
                     itemBuilder: (context, index) {
-                      return CardAssignedTask(
-                        subtaskNumber: dummyTasks[index]['subtaskNumber'] ?? '',
-                        taskType: dummyTasks[index]['taskType'] ?? '',
-                        equipmentNo: dummyTasks[index]['equipmentNo'] ?? '',
-                        assignedDate: dummyTasks[index]['assignedDate'] ?? '',
-                        dept: dummyTasks[index]['dept'] ?? '',
-                      );
+                      if(myTask[index].status == "New Task"){
+                        return CardAssignedTask(
+                          swoNumber: myTask[index].swoNumber ?? '',
+                          taskType: myTask[index].taskType ?? '',
+                          equipmentNo: myTask[index].equipmentId ?? '',
+                          assignedDate: myTask[index].assignedDate ?? '',
+                          dept: myTask[index].dept ?? '',
+                          selectedIndex: index,
+                          saveTasks: widget.saveTasks,
+                          refreshList: refreshList,
+                        );
+                      }else{
+                        return SizedBox();
+                      }
+
                     },
                   ),
                 ),

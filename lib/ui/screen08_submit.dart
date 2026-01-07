@@ -1,3 +1,4 @@
+import 'package:field_technician_demo/app_data.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 
@@ -6,15 +7,19 @@ import 'components/card_customer_acknowledgement.dart';
 class SubmitForm extends StatefulWidget {
   final String swoNumber;
   final String swoType;
-  final List<Map<String, dynamic>> spareParts;
+  List<Map<String, dynamic>> spareParts;
   final List<File> photos;
+  final int selectedIndex;
+  Function saveTasks;
 
-  const SubmitForm({
+  SubmitForm({
     super.key,
     required this.swoNumber,
     required this.swoType,
-    this.spareParts = const [],
+    required this.spareParts,
     this.photos = const [],
+    required this.selectedIndex,
+    required this.saveTasks
   });
 
   @override
@@ -100,6 +105,14 @@ class _SubmitFormState extends State<SubmitForm> {
         return false;
       }
     }
+
+    for (var i = 0; i < widget.spareParts.length; i++) {
+      String value = _quantityControllers['$i']?.text.trim() ?? '';
+      myTask[widget.selectedIndex].spareParts[i]['quantity'] = value;
+    }
+
+    widget.saveTasks(myTask);
+
     return true;
   }
 
@@ -112,6 +125,9 @@ class _SubmitFormState extends State<SubmitForm> {
     // Check if task type requires customer acknowledgment (BD or PM)
     final requiresCustomerAck = ['BD', 'PM'].contains(widget.swoType.toUpperCase());
 
+    myTask[widget.selectedIndex].technicianNotes = _notesController.text.toString();
+    widget.saveTasks(myTask);
+
     if (requiresCustomerAck) {
       // Show customer acknowledgment popup
       await showDialog(
@@ -119,9 +135,11 @@ class _SubmitFormState extends State<SubmitForm> {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return CustomerAcknowledgmentPopup(
-            subtaskNumber: widget.swoNumber,
+            swoNumber: widget.swoNumber,
             taskType: widget.swoType,
             onCancel: () => Navigator.of(context).pop(),
+            selectedIndex: widget.selectedIndex,
+            saveTasks: widget.saveTasks,
           );
         },
       );
@@ -139,6 +157,11 @@ class _SubmitFormState extends State<SubmitForm> {
           _isSubmitting = false;
         });
         _showSuccessToast('Task submitted successfully!');
+
+        setState(() {
+          myTask[widget.selectedIndex].status = "Completed";
+          widget.saveTasks(myTask);
+        });
 
         // Navigate back after delay
         await Future.delayed(const Duration(seconds: 1));
@@ -178,7 +201,9 @@ class _SubmitFormState extends State<SubmitForm> {
                           color: Colors.white,
                           size: 20
                       ),
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: (){
+                        Navigator.pop(context);
+                      },
                     ),
                     Expanded(
                       child: Column(
@@ -382,17 +407,17 @@ class _SubmitFormState extends State<SubmitForm> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          part['name'] ?? '',
+                                          part['item_name'] ?? '',
                                           style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w500,
                                             color: Color(0xFF2C3E50),
                                           ),
                                         ),
-                                        if (part['code'] != null) ...[
+                                        if (part['item_code'] != null) ...[
                                           const SizedBox(height: 4),
                                           Text(
-                                            part['code'],
+                                            part['item_code'],
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: Colors.grey.shade600,
@@ -540,6 +565,7 @@ class _SubmitFormState extends State<SubmitForm> {
   }
 }
 
+/*
 // Example usage with dummy data
 class SubmitFormDemo extends StatelessWidget {
   const SubmitFormDemo({super.key});
@@ -555,7 +581,8 @@ class SubmitFormDemo extends StatelessWidget {
         {'name': 'Hydraulic Oil', 'code': 'HO-9012'},
         {'name': 'Brake Pad Set', 'code': 'BP-3456'},
       ],
-      photos: [],
+      photos: [], selectedIndex: 0, saveTasks: ,
     );
   }
 }
+*/

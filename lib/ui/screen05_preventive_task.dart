@@ -1,3 +1,4 @@
+import 'package:field_technician_demo/app_data.dart';
 import 'package:field_technician_demo/ui/screen05_request_spare_part.dart';
 import 'package:field_technician_demo/ui/screen08_submit.dart';
 import 'package:field_technician_demo/ui/screen10_service_checklist.dart';
@@ -6,20 +7,28 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
+import 'package:intl/intl.dart';
+
 class SwoChecklistPM extends StatefulWidget {
   final String subtaskNumber;
   final String taskType;
   final String equipmentNo;
   final String assignedDate;
   final String dept;
+  final int selectedIndex;
+  Function saveTasks;
+  Function refreshList;
 
-  const SwoChecklistPM({
+  SwoChecklistPM({
     super.key,
-    this.subtaskNumber = 'STK-001',
-    this.taskType = 'PM',
-    this.equipmentNo = 'EQ-12345',
-    this.assignedDate = '18-12-2025',
-    this.dept = 'EE',
+    this.subtaskNumber = '',
+    this.taskType = '',
+    this.equipmentNo = '',
+    this.assignedDate = '',
+    this.dept = '',
+    required this.selectedIndex,
+    required this.saveTasks,
+    required this.refreshList
   });
 
   @override
@@ -29,13 +38,28 @@ class SwoChecklistPM extends StatefulWidget {
 class _SwoChecklistPMState extends State<SwoChecklistPM> {
   // Task status state
   String currentStatus = 'New Task';
-  bool isServiceTaskDetailsExpanded = false;
-
-  // Task timing info
   String timeStart = '---';
   String duration = '0 hour';
   String pauseTime = '-';
   String pauseReason = '-';
+
+  @override
+  void initState() {
+    currentStatus = myTask[widget.selectedIndex].status;
+    timeStart = myTask[widget.selectedIndex].timeStart;
+    pauseTime = myTask[widget.selectedIndex].pauseTime;
+    pauseReason = myTask[widget.selectedIndex].pauseReason;
+
+    super.initState();
+  }
+
+  final List<String> pauseReasons = [
+    'Waiting for Spare Part',
+    'Waiting for Approval',
+    'Cannot Complete Today',
+    'Prioritize Another Task',
+    'On Break',
+  ];
 
   // Controllers
   final TextEditingController hourMeter1Controller = TextEditingController(text: '');
@@ -43,9 +67,10 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
 
   // Photo functionality
   final ImagePicker _picker = ImagePicker();
-  final List<File> _photos = [];
+  //final List<File> _photos = [];
   final int _maxPhotos = 8;
 
+  /*
   // Dummy service checklist data
   final List<Map<String, dynamic>> serviceChecklist = [
     {'name': 'Engine Check', 'completed': false},
@@ -53,6 +78,7 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
     {'name': 'Hydraulic System', 'completed': false},
     {'name': 'Brake System', 'completed': false},
   ];
+  */
 
   @override
   void dispose() {
@@ -61,19 +87,31 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
     super.dispose();
   }
 
+  // Start Task Method
   void startTask() {
     setState(() {
       isServiceTaskDetailsExpanded = false;
       if (currentStatus == 'New Task' || currentStatus == 'Paused') {
         currentStatus = 'In Progress';
         if (timeStart == '---') {
-          timeStart = '18-12-2025 09:30:00';
+          //timeStart = '18-12-2025 09:30:00';
+          timeStart = DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.now());
+        }
+        // Clear pause data when resuming
+        if (pauseTime != '-') {
+          pauseTime = '-';
+          pauseReason = '-';
         }
       }
+      myTask[widget.selectedIndex].status = currentStatus;
+      myTask[widget.selectedIndex].timeStart = timeStart;
+      widget.saveTasks(myTask);
+
     });
     _showToast('Task started successfully', isError: false);
   }
 
+  // Pause Task Method
   void pauseTask() {
     if (currentStatus != 'In Progress') {
       _showToast('Task must be in progress to pause', isError: true);
@@ -82,6 +120,7 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
 
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         String selectedReason = '';
         return StatefulBuilder(
@@ -95,18 +134,32 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                   children: [
                     const Text(
                       'Pause Task',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2C3E50),
+                      ),
                     ),
                     const SizedBox(height: 8),
-                    Text('Service Task ID: ${widget.subtaskNumber}'),
+                    Text(
+                      'Service Task ID: ${widget.subtaskNumber}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     const Text(
                       'Select Reason',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2C3E50),
+                      ),
                     ),
                     const SizedBox(height: 12),
-                    ...['Waiting for Spare Part', 'Waiting for Approval', 'Cannot Complete Today', 'On Break']
-                        .map((reason) => Padding(
+                    // Pause reason buttons
+                    ...pauseReasons.map((reason) => Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: SizedBox(
                         width: double.infinity,
@@ -114,14 +167,32 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                           onPressed: () => setDialogState(() => selectedReason = reason),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: reason == selectedReason
-                                ? const Color(0xFF6366F1)
-                                : const Color(0xFFE0E7FF),
-                            foregroundColor: reason == selectedReason ? Colors.white : const Color(0xFF6366F1),
-                            elevation: reason == selectedReason ? 4 : 0,
+                                ? const Color(0xFF3498DB)
+                                : const Color(0xFFF8F9FA),
+                            foregroundColor: reason == selectedReason
+                                ? Colors.white
+                                : const Color(0xFF2C3E50),
+                            elevation: reason == selectedReason ? 2 : 0,
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(
+                                color: reason == selectedReason
+                                    ? const Color(0xFF3498DB)
+                                    : Colors.grey.shade300,
+                                width: 1.5,
+                              ),
+                            ),
                           ),
-                          child: Text(reason, style: const TextStyle(fontSize: 14)),
+                          child: Text(
+                            reason,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: reason == selectedReason
+                                  ? FontWeight.w600
+                                  : FontWeight.w500,
+                            ),
+                          ),
                         ),
                       ),
                     )),
@@ -133,10 +204,18 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                             onPressed: () => Navigator.pop(context),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 14),
-                              side: const BorderSide(color: Color(0xFF6366F1)),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              side: const BorderSide(color: Color(0xFF3498DB), width: 1.5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
-                            child: const Text('Cancel'),
+                            child: const Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: Color(0xFF3498DB),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -147,18 +226,35 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                                 : () {
                               Navigator.pop(context);
                               setState(() {
+                                isServiceTaskDetailsExpanded = false;
                                 currentStatus = 'Paused';
                                 pauseReason = selectedReason;
-                                pauseTime = '18-12-2025 11:30:00';
+                                //pauseTime = '18-12-2025 11:30:00';
+                                pauseTime = DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.now());
+                                duration = '2 hours'; // Example duration
+
+                                myTask[widget.selectedIndex].status = currentStatus;
+                                myTask[widget.selectedIndex].pauseReason = pauseReason;
+                                myTask[widget.selectedIndex].pauseTime = pauseTime;
+
                               });
                               _showToast('Task paused', isError: false);
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6366F1),
+                              backgroundColor: selectedReason.isEmpty
+                                  ? Colors.grey.shade300
+                                  : const Color(0xFFE74C3C),
+                              foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: selectedReason.isEmpty ? 0 : 2,
                             ),
-                            child: const Text('Confirm', style: TextStyle(color: Colors.white)),
+                            child: const Text(
+                              'Confirm',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
                           ),
                         ),
                       ],
@@ -173,30 +269,59 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
     );
   }
 
+  // UI state
+  bool isServiceTaskDetailsExpanded = false;
+
   Future<void> _takePhoto() async {
-    if (_photos.length >= _maxPhotos) {
-      _showToast('Maximum $_maxPhotos photos allowed', isError: true);
+    if (myTask[widget.selectedIndex].imagePath.length >= _maxPhotos) {
+      _showPhotoLimitDialog();
       return;
     }
     final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
     if (photo != null) {
-      setState(() => _photos.add(File(photo.path)));
+      setState(() {
+        myTask[widget.selectedIndex].imagePath.add(photo.path);
+        widget.saveTasks(myTask);
+      });
     }
   }
 
   Future<void> _pickFromGallery() async {
-    if (_photos.length >= _maxPhotos) {
-      _showToast('Maximum $_maxPhotos photos allowed', isError: true);
+    if (myTask[widget.selectedIndex].imagePath.length >= _maxPhotos) {
+      _showPhotoLimitDialog();
       return;
     }
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      setState(() => _photos.add(File(image.path)));
+      setState(() {
+        myTask[widget.selectedIndex].imagePath.add(image.path);
+        widget.saveTasks(myTask);
+      });
     }
   }
 
   void _removePhoto(int index) {
-    setState(() => _photos.removeAt(index));
+    setState(() {
+      myTask[widget.selectedIndex].imagePath.removeAt(index);
+      widget.saveTasks(myTask);
+    });
+  }
+
+  void _showPhotoLimitDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Photo Limit Reached'),
+        content: const Text('You can add a maximum of 8 photos.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showToast(String message, {required bool isError}) {
@@ -217,6 +342,7 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -231,7 +357,10 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
           backgroundColor: const Color(0xFF0A4D8C),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              widget.refreshList();
+              Navigator.pop(context);
+            },
           ),
           title: Column(
             children: [
@@ -240,7 +369,7 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                 style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
               ),
               Text(
-                widget.subtaskNumber,
+                myTask[widget.selectedIndex].swoNumber,
                 style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13, fontWeight: FontWeight.w400),
               ),
             ],
@@ -303,10 +432,10 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                               children: [
                                 const Divider(height: 1),
                                 const SizedBox(height: 12),
-                                _buildDetailRow('Equipment No.', widget.equipmentNo),
-                                _buildDetailRow('SWO Type', widget.taskType),
-                                _buildDetailRow('SWO No.', widget.subtaskNumber),
-                                _buildDetailRow('Assigned Date', widget.assignedDate),
+                                _buildDetailRow('Equipment No.', myTask[widget.selectedIndex].equipmentId),
+                                _buildDetailRow('SWO Type', myTask[widget.selectedIndex].taskType),
+                                _buildDetailRow('SWO No.', myTask[widget.selectedIndex].swoNumber),
+                                _buildDetailRow('Assigned Date', myTask[widget.selectedIndex].assignedDate),
                                 _buildDetailRow('PIC Remarks', 'Regular maintenance required'),
                               ],
                             ),
@@ -331,6 +460,18 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => RentalDetailsScreen(
+                                    swoNumber: myTask[widget.selectedIndex].swoNumber,
+                                    taskType: myTask[widget.selectedIndex].taskType,
+                                    rentalCompanyName: myTask[widget.selectedIndex].myCompanyInfo.rentalCompany, // Use your dummy data
+                                    picName: myTask[widget.selectedIndex].myCompanyInfo.picName,
+                                    picContact: myTask[widget.selectedIndex].myCompanyInfo.picContactNum,
+                                    latitude: myTask[widget.selectedIndex].myCompanyInfo.latitude.toString(), // Your GPS coordinates
+                                    longitude: myTask[widget.selectedIndex].myCompanyInfo.longitude.toString(),
+                                  ),
+                                ),
+                                /*
+                                MaterialPageRoute(
+                                  builder: (context) => RentalDetailsScreen(
                                     swoNumber: widget.subtaskNumber,
                                     taskType: widget.taskType,
                                     rentalCompanyName: 'ABC Rental Sdn. Bhd.',
@@ -340,6 +481,7 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                                     longitude: '101.62514851595668',
                                   ),
                                 ),
+                                */
                               );
                             },
                           ),
@@ -356,8 +498,10 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => SparePartIssuesScreen(
-                                    subtaskNumber: widget.subtaskNumber,
+                                    swoNumber: widget.subtaskNumber,
                                     taskType: widget.taskType,
+                                    spareParts: myTask[widget.selectedIndex].spareParts,
+                                    /*
                                     spareParts: [
                                       {
                                         'item_name': 'Brake Pad Set',
@@ -380,6 +524,7 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                                         'quantity': '5',
                                       },
                                     ],
+                                    */
                                   ),
                                 ),
                               );
@@ -412,13 +557,20 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Task Status Card
-                    _buildCard(
+                    _buildModernCard(
                       child: Column(
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('Task Status', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                              const Text(
+                                'Task Status',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  color: Color(0xFF2C3E50),
+                                ),
+                              ),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
@@ -434,7 +586,7 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                                     fontSize: 13,
                                   ),
                                 ),
-                              ),
+                              )
                             ],
                           ),
                           const SizedBox(height: 16),
@@ -443,11 +595,29 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                               Expanded(
                                 child: ElevatedButton.icon(
                                   onPressed: currentStatus == 'In Progress' ? null : startTask,
-                                  icon: Icon(_getStartButtonIcon(), size: 18),
-                                  label: Text(_getStartButtonText()),
+                                  icon: Icon(
+                                    currentStatus == 'Paused'
+                                        ? Icons.play_arrow
+                                        : currentStatus == 'In Progress'
+                                        ? Icons.check
+                                        : Icons.play_arrow,
+                                    size: 18,
+                                  ),
+                                  label: Text(
+                                    currentStatus == 'Paused'
+                                        ? 'Resume'
+                                        : currentStatus == 'In Progress'
+                                        ? 'Started'
+                                        : 'Start',
+                                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                                  ),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: _getStartButtonColor(),
-                                    foregroundColor: Colors.white,
+                                    backgroundColor: currentStatus == 'In Progress'
+                                        ? Colors.grey.shade300
+                                        : const Color(0xFF27AE60),
+                                    foregroundColor: currentStatus == 'In Progress'
+                                        ? Colors.grey.shade600
+                                        : Colors.white,
                                     padding: const EdgeInsets.symmetric(vertical: 14),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                     elevation: currentStatus == 'In Progress' ? 0 : 2,
@@ -459,12 +629,17 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                                 child: ElevatedButton.icon(
                                   onPressed: currentStatus == 'In Progress' ? pauseTask : null,
                                   icon: const Icon(Icons.pause, size: 18),
-                                  label: const Text('Pause'),
+                                  label: const Text(
+                                    'Pause',
+                                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                                  ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: currentStatus == 'In Progress'
-                                        ? const Color(0xFFEF4444)
-                                        : const Color(0xFFE2E8F0),
-                                    foregroundColor: currentStatus == 'In Progress' ? Colors.white : const Color(0xFF94A3B8),
+                                        ? const Color(0xFFE74C3C)
+                                        : Colors.grey.shade300,
+                                    foregroundColor: currentStatus == 'In Progress'
+                                        ? Colors.white
+                                        : Colors.grey.shade600,
                                     padding: const EdgeInsets.symmetric(vertical: 14),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                     elevation: currentStatus == 'In Progress' ? 2 : 0,
@@ -480,19 +655,27 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                     const SizedBox(height: 16),
 
                     // Task Details Card
-                    _buildCard(
-                      title: 'Task Details',
+                    _buildModernCard(
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const Text(
+                            'Task Details',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: Color(0xFF2C3E50),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
                           _buildInfoRow('Assigned Date', widget.assignedDate),
                           _buildInfoRow('Time Start', timeStart),
-                          _buildInfoRow('Duration', duration),
+                          _buildInfoRow('Duration', '0 hour'),
                           _buildInfoRow('Pause Time', pauseTime),
                           _buildInfoRow('Pause Reason', pauseReason),
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 16),
 
                     // Hour Meters Row
@@ -606,7 +789,7 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          ...serviceChecklist.asMap().entries.map((entry) {
+                          ...myTask[widget.selectedIndex].serviceChecklist.asMap().entries.map((entry) {
                             return Container(
                               margin: const EdgeInsets.only(bottom: 8),
                               child: Material(
@@ -628,7 +811,8 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                                     // Update the status if all subtasks are completed
                                     if (result == true) {
                                       setState(() {
-                                        serviceChecklist[entry.key]['completed'] = true;
+                                        myTask[widget.selectedIndex].serviceChecklist[entry.key]['completed'] = true;
+                                        widget.saveTasks(myTask);
                                       });
                                       _showToast('${entry.value['name']} completed', isError: false);
                                     }
@@ -678,7 +862,7 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                                 ),
                               ),
                             );
-                          }).toList(),
+                          }),
                         ],
                       ),
                     ),
@@ -686,11 +870,19 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                     const SizedBox(height: 16),
 
                     // Photos Section
-                    _buildCard(
-                      title: 'Add Photos',
+                    _buildModernCard(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const Text(
+                            'Add Photos',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: Color(0xFF2C3E50),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
                           Row(
                             children: [
                               _buildPhotoOption(
@@ -708,12 +900,12 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                               ),
                             ],
                           ),
-                          if (_photos.isNotEmpty) ...[
+                          if (myTask[widget.selectedIndex].imagePath.isNotEmpty) ...[
                             const SizedBox(height: 16),
                             Wrap(
                               spacing: 12,
                               runSpacing: 12,
-                              children: List.generate(_photos.length, (index) {
+                              children: List.generate(myTask[widget.selectedIndex].imagePath.length, (index) {
                                 return Stack(
                                   children: [
                                     Container(
@@ -722,10 +914,9 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(12),
                                         image: DecorationImage(
-                                          image: FileImage(_photos[index]),
+                                          image: FileImage(File(myTask[widget.selectedIndex].imagePath[index])),
                                           fit: BoxFit.cover,
                                         ),
-                                        border: Border.all(color: const Color(0xFFE2E8F0), width: 2),
                                       ),
                                     ),
                                     Positioned(
@@ -736,10 +927,14 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                                         child: Container(
                                           padding: const EdgeInsets.all(4),
                                           decoration: const BoxDecoration(
-                                            color: Color(0xFFEF4444),
+                                            color: Color(0xFFE74C3C),
                                             shape: BoxShape.circle,
                                           ),
-                                          child: const Icon(Icons.close, color: Colors.white, size: 16),
+                                          child: const Icon(
+                                            Icons.close,
+                                            color: Colors.white,
+                                            size: 16,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -759,6 +954,12 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
+
+                          myTask[widget.selectedIndex].hourMeter1 = hourMeter1Controller.text.toString();
+                          myTask[widget.selectedIndex].hourMeter2 = hourMeter2Controller.text.toString();
+
+
+                          widget.saveTasks(myTask);
                           // Navigate to Submit Page for PM tasks
                           Navigator.push(
                             context,
@@ -766,12 +967,10 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                               builder: (context) => SubmitForm(
                                 swoNumber: widget.subtaskNumber,
                                 swoType: 'PM',
-                                spareParts: [
-                                  {'name': 'Engine Oil Filter', 'code': 'EOF-1234'},
-                                  {'name': 'Air Filter', 'code': 'AF-5678'},
-                                  {'name': 'Hydraulic Oil', 'code': 'HO-9012'},
-                                ],
-                                photos: _photos,
+                                spareParts: myTask[widget.selectedIndex].spareParts,
+                                photos: myTask[widget.selectedIndex].imagePath.map((path) => File(path)).toList(),
+                                selectedIndex: widget.selectedIndex,
+                                saveTasks: widget.saveTasks,
                               ),
                             ),
                           );
@@ -806,34 +1005,19 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
     );
   }
 
-  Widget _buildCard({String? title, required Widget child}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (title != null)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-              child: Text(
-                title,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
-              ),
-            ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(16, title != null ? 0 : 16, 16, 16),
-            child: child,
-          ),
-        ],
-      ),
-    );
+  Color _getStatusColor() {
+    switch (currentStatus) {
+      case 'In Progress':
+        return const Color(0xFF3498DB);
+      case 'Paused':
+        return const Color(0xFFF39C12);
+      case 'Completed':
+        return const Color(0xFF27AE60);
+      default:
+        return Colors.grey;
+    }
   }
+
 
   Widget _buildDetailRow(String label, String value) {
     return Padding(
@@ -940,35 +1124,5 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
         ),
       ),
     );
-  }
-
-  Color _getStatusColor() {
-    switch (currentStatus) {
-      case 'In Progress':
-        return const Color(0xFF3B82F6);
-      case 'Paused':
-        return const Color(0xFFF59E0B);
-      case 'Completed':
-        return const Color(0xFF10B981);
-      default:
-        return const Color(0xFF64748B);
-    }
-  }
-
-  Color _getStartButtonColor() {
-    return currentStatus == 'In Progress' ? const Color(0xFFE2E8F0) : const Color(
-        0xFF27AE60);
-  }
-
-  String _getStartButtonText() {
-    if (currentStatus == 'Paused') return 'Resume';
-    if (currentStatus == 'In Progress') return 'Started';
-    return 'Start';
-  }
-
-  IconData _getStartButtonIcon() {
-    if (currentStatus == 'Paused') return Icons.play_arrow;
-    if (currentStatus == 'In Progress') return Icons.check;
-    return Icons.play_arrow;
   }
 }

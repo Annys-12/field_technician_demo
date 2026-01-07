@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
+import '../../app_data.dart';
 import '../screen04_breakdown_task.dart';
-import '../screen05_preventive_task.dart'; // Import your BD screen
+import '../screen05_preventive_task.dart';
+import '../screen05_request_spare_part.dart'; // Import your BD screen
 
 class CardAssignedTask extends StatefulWidget {
-  final String subtaskNumber;
+  final String swoNumber;
   final String taskType;
   final String equipmentNo;
   final String assignedDate;
   final String dept;
+  final int selectedIndex;
+  Function saveTasks;
+  Function refreshList;
 
-  const CardAssignedTask({
+  CardAssignedTask({
     super.key,
-    this.subtaskNumber = '',
+    this.swoNumber = '',
     this.taskType = '',
     this.equipmentNo = '',
     this.assignedDate = '',
     this.dept = '',
+    required this.selectedIndex,
+    required this.saveTasks,
+    required this.refreshList
   });
 
   @override
@@ -29,11 +37,14 @@ class _CardAssignedTaskState extends State<CardAssignedTask> {
         context,
         MaterialPageRoute(
           builder: (context) => SwoChecklistBD(
-            subtaskNumber: widget.subtaskNumber,
+            subtaskNumber: widget.swoNumber,
             taskType: widget.taskType,
             equipmentNo: widget.equipmentNo,
             assignedDate: widget.assignedDate,
             dept: widget.dept,
+            selectedIndex: widget.selectedIndex,
+            saveTasks: widget.saveTasks,
+            refreshList: widget.refreshList,
           ),
         ),
       );
@@ -42,11 +53,14 @@ class _CardAssignedTaskState extends State<CardAssignedTask> {
         context,
         MaterialPageRoute(
           builder: (context) => SwoChecklistPM(
-            subtaskNumber: widget.subtaskNumber,
+            subtaskNumber: widget.swoNumber,
             taskType: widget.taskType,
             equipmentNo: widget.equipmentNo,
             assignedDate: widget.assignedDate,
             dept: widget.dept,
+            selectedIndex: widget.selectedIndex,
+            saveTasks: widget.saveTasks,
+            refreshList: widget.refreshList,
           ),
         ),
       );
@@ -80,7 +94,7 @@ class _CardAssignedTaskState extends State<CardAssignedTask> {
                 Row(
                   children: [
                     Text(
-                      widget.subtaskNumber,
+                      widget.swoNumber,
                       style: const TextStyle(
                         color: Colors.black,
                         fontSize: 16,
@@ -164,10 +178,21 @@ class _CardAssignedTaskState extends State<CardAssignedTask> {
                 ),
                 Row(
                   children: [
+                    // In CardAssignedTask widget, update the Request Parts button's onTap:
+
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
-                          // Request Parts button action
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SparePartIssuesScreen(
+                                swoNumber: widget.swoNumber,
+                                taskType: widget.taskType,
+                                spareParts: myTask[widget.selectedIndex].spareParts,
+                              ),
+                            ),
+                          );
                         },
                         child: Container(
                           decoration: BoxDecoration(

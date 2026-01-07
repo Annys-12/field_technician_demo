@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../app_data.dart';
 import '../screen04_breakdown_task.dart';
 import '../screen05_preventive_task.dart';
+import '../screen05_request_spare_part.dart';
 
 class CardInProgress extends StatefulWidget {
   final String swoNumber;
@@ -13,8 +15,11 @@ class CardInProgress extends StatefulWidget {
   final String duration;
   final String pauseTime;
   final String pauseReason;
+  final int selectedIndex;
+  Function saveTasks;
+  Function refreshList;
 
-  const CardInProgress({
+  CardInProgress({
     super.key,
     this.swoNumber = '',
     this.taskType = '',
@@ -26,6 +31,9 @@ class CardInProgress extends StatefulWidget {
     this.duration = '',
     this.pauseTime = '',
     this.pauseReason = '',
+    required this.selectedIndex,
+    required this.saveTasks,
+    required this.refreshList
   });
 
   @override
@@ -44,6 +52,9 @@ class _CardInProgressState extends State<CardInProgress> {
             equipmentNo: widget.equipmentNo,
             assignedDate: widget.date,
             dept: widget.dept,
+            selectedIndex: widget.selectedIndex,
+            saveTasks: widget.saveTasks,
+            refreshList: widget.refreshList,
           ),
         ),
       );
@@ -57,6 +68,9 @@ class _CardInProgressState extends State<CardInProgress> {
             equipmentNo: widget.equipmentNo,
             assignedDate: widget.date,
             dept: widget.dept,
+            selectedIndex: widget.selectedIndex,
+            saveTasks: widget.saveTasks,
+            refreshList: widget.refreshList,
           ),
         ),
       );
@@ -211,7 +225,16 @@ class _CardInProgressState extends State<CardInProgress> {
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
-                          // Request Parts button action
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SparePartIssuesScreen(
+                                swoNumber: widget.swoNumber,
+                                taskType: widget.taskType,
+                                spareParts: myTask[widget.selectedIndex].spareParts,
+                              ),
+                            ),
+                          );
                         },
                         child: Container(
                           decoration: BoxDecoration(

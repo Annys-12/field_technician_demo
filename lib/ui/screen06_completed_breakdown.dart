@@ -1,7 +1,11 @@
+import 'package:field_technician_demo/app_data.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 
 class CompletedTaskBD extends StatefulWidget {
+
+  final int selectedIndex;
+  /*
   final String subtaskNumber;
   final String taskType;
   final String equipmentNo;
@@ -22,9 +26,12 @@ class CompletedTaskBD extends StatefulWidget {
   final String breakdownCauseBy;
   final List<String> serviceChecklistItems;
   final List<Map<String, dynamic>> consumedParts;
+  */
 
   const CompletedTaskBD({
     super.key,
+    required this.selectedIndex,
+    /*
     this.subtaskNumber = '',
     this.taskType = '',
     this.equipmentNo = '',
@@ -64,6 +71,7 @@ class CompletedTaskBD extends StatefulWidget {
       },
     ],
     this.breakdownCauseBy = 'TTL',
+    */
   });
 
   @override
@@ -72,6 +80,12 @@ class CompletedTaskBD extends StatefulWidget {
 
 class _CompletedTaskBDState extends State<CompletedTaskBD> {
   bool isServiceTaskDetailsExpanded = false;
+
+  @override
+  void initState() {
+    print("consumed spare parts: ${myTask[widget.selectedIndex].spareParts}");
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +139,7 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  widget.subtaskNumber,
+                                  myTask[widget.selectedIndex].swoNumber,
                                   style: const TextStyle(
                                     color: Color(0xFFE3F2FD),
                                     fontSize: 13,
@@ -195,11 +209,11 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                                 children: [
                                   Divider(height: 1, color: Colors.grey.shade200),
                                   const SizedBox(height: 12),
-                                  _buildDetailRow('Equipment No.', widget.equipmentNo),
-                                  _buildDetailRow('SWO Type', widget.taskType),
-                                  _buildDetailRow('SWO No.', widget.subtaskNumber),
-                                  _buildDetailRow('Assigned Date', widget.assignedDate),
-                                  _buildDetailRow('Department', widget.dept),
+                                  _buildDetailRow('Equipment No.', myTask[widget.selectedIndex].equipmentId),
+                                  _buildDetailRow('SWO Type', myTask[widget.selectedIndex].taskType),
+                                  _buildDetailRow('SWO No.', myTask[widget.selectedIndex].swoNumber),
+                                  _buildDetailRow('Assigned Date', myTask[widget.selectedIndex].assignedDate),
+                                  _buildDetailRow('Department', myTask[widget.selectedIndex].dept),
                                 ],
                               ),
                             ),
@@ -263,12 +277,12 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                             ],
                           ),
                           const SizedBox(height: 16),
-                          _buildInfoRow('Assigned Date', widget.assignedDate.isNotEmpty ? widget.assignedDate : '---'),
-                          _buildInfoRow('Time Start', widget.timeStart.isNotEmpty ? widget.timeStart : '---'),
-                          _buildInfoRow('Duration', widget.duration.isNotEmpty ? widget.duration : '---'),
-                          _buildInfoRow('Pause Time', widget.pauseTime.isNotEmpty && widget.pauseTime != '-' ? widget.pauseTime : 'No pause'),
-                          _buildInfoRow('Pause Reason', widget.pauseReason.isNotEmpty && widget.pauseReason != '-' ? widget.pauseReason : 'No pause'),
-                          _buildInfoRow('Completed Time', widget.endTime.isNotEmpty ? widget.endTime : '---'),
+                          _buildInfoRow('Assigned Date', myTask[widget.selectedIndex].assignedDate.isNotEmpty ? myTask[widget.selectedIndex].assignedDate : '---'),
+                          _buildInfoRow('Time Start', myTask[widget.selectedIndex].timeStart.isNotEmpty ? myTask[widget.selectedIndex].timeStart : '---'),
+                          _buildInfoRow('Duration', myTask[widget.selectedIndex].duration.isNotEmpty ? myTask[widget.selectedIndex].duration : '---'),
+                          _buildInfoRow('Pause Time', myTask[widget.selectedIndex].pauseTime.isNotEmpty && myTask[widget.selectedIndex].pauseTime != '-' ? myTask[widget.selectedIndex].pauseTime : 'No pause'),
+                          _buildInfoRow('Pause Reason', myTask[widget.selectedIndex].pauseReason.isNotEmpty && myTask[widget.selectedIndex].pauseReason != '-' ? myTask[widget.selectedIndex].pauseReason : 'No pause'),
+                          _buildInfoRow('Completed Time', myTask[widget.selectedIndex].timeEnd.isNotEmpty ? myTask[widget.selectedIndex].timeEnd : '---'),
                         ],
                       ),
                     ),
@@ -305,7 +319,7 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                                     border: Border.all(color: const Color(0xFFE2E8F0)),
                                   ),
                                   child: Text(
-                                    widget.hourMeter1.isEmpty || widget.hourMeter1 == 'null' ? '0' : widget.hourMeter1,
+                                    myTask[widget.selectedIndex].hourMeter1.isEmpty || myTask[widget.selectedIndex].hourMeter1 == 'null' ? '0' : myTask[widget.selectedIndex].hourMeter1,
                                     style: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
@@ -345,7 +359,7 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                                     border: Border.all(color: const Color(0xFFE2E8F0)),
                                   ),
                                   child: Text(
-                                    widget.hourMeter2.isEmpty || widget.hourMeter2 == 'null' ? '0' : widget.hourMeter2,
+                                    myTask[widget.selectedIndex].hourMeter2.isEmpty || myTask[widget.selectedIndex].hourMeter2 == 'null' ? '0' : myTask[widget.selectedIndex].hourMeter2,
                                     style: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
@@ -380,7 +394,7 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                             ],
                           ),
                           const SizedBox(height: 16),
-                          widget.serviceChecklistItems.isEmpty
+                          myTask[widget.selectedIndex].serviceChecklist.isEmpty
                               ? Container(
                             width: double.infinity,
                             padding: const EdgeInsets.all(20),
@@ -403,7 +417,7 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                             ),
                           )
                               : Column(
-                            children: widget.serviceChecklistItems.map((item) {
+                            children: myTask[widget.selectedIndex].serviceChecklist.map((item) {
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 10),
                                 padding: const EdgeInsets.all(14),
@@ -432,7 +446,7 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        item,
+                                        item['name'],
                                         style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
@@ -452,6 +466,77 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                     const SizedBox(height: 16),
 
                     // Photos
+                    // _buildModernCard(
+                    //   child: Column(
+                    //     crossAxisAlignment: CrossAxisAlignment.start,
+                    //     children: [
+                    //       Row(
+                    //         children: [
+                    //           const Text(
+                    //             'Photos',
+                    //             style: TextStyle(
+                    //               fontWeight: FontWeight.w700,
+                    //               fontSize: 17,
+                    //               color: Color(0xFF1E293B),
+                    //             ),
+                    //           ),
+                    //         ],
+                    //       ),
+                    //       const SizedBox(height: 16),
+                    //       myTask[widget.selectedIndex].imagePath.isEmpty
+                    //           ? Container(
+                    //         width: double.infinity,
+                    //         padding: const EdgeInsets.all(20),
+                    //         decoration: BoxDecoration(
+                    //           color: const Color(0xFFF8FAFC),
+                    //           borderRadius: BorderRadius.circular(12),
+                    //           border: Border.all(color: const Color(0xFFE2E8F0)),
+                    //         ),
+                    //         child: const Column(
+                    //           children: [
+                    //             Text(
+                    //               'No photos uploaded',
+                    //               style: TextStyle(
+                    //                 color: Color(0xFF64748B),
+                    //                 fontSize: 14,
+                    //               ),
+                    //               textAlign: TextAlign.center,
+                    //             ),
+                    //           ],
+                    //         ),
+                    //       )
+                    //           : Wrap(
+                    //         spacing: 12,
+                    //         runSpacing: 12,
+                    //         children: List.generate(myTask[widget.selectedIndex].imagePath.length, (index) {
+                    //           return Container(
+                    //             width: 100,
+                    //             height: 100,
+                    //             decoration: BoxDecoration(
+                    //               borderRadius: BorderRadius.circular(16),
+                    //               boxShadow: [
+                    //                 BoxShadow(
+                    //                   color: Colors.black.withOpacity(0.1),
+                    //                   blurRadius: 8,
+                    //                   offset: const Offset(0, 2),
+                    //                 ),
+                    //               ],
+                    //             ),
+                    //             child: ClipRRect(
+                    //               borderRadius: BorderRadius.circular(16),
+                    //               child: Image.file(
+                    //                 File(myTask[widget.selectedIndex].imagePath[index]),
+                    //                 fit: BoxFit.cover,
+                    //               ),
+                    //             ),
+                    //           );
+                    //         }),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+
+                    // Photos
                     _buildModernCard(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,7 +554,7 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                             ],
                           ),
                           const SizedBox(height: 16),
-                          widget.photos.isEmpty
+                          myTask[widget.selectedIndex].imagePath.isEmpty
                               ? Container(
                             width: double.infinity,
                             padding: const EdgeInsets.all(20),
@@ -480,6 +565,12 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                             ),
                             child: const Column(
                               children: [
+                                // Icon(
+                                //   Icons.image_not_supported_outlined,
+                                //   size: 40,
+                                //   color: Color(0xFF64748B),
+                                // ),
+                                // SizedBox(height: 8),
                                 Text(
                                   'No photos uploaded',
                                   style: TextStyle(
@@ -494,29 +585,42 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                               : Wrap(
                             spacing: 12,
                             runSpacing: 12,
-                            children: List.generate(widget.photos.length, (index) {
-                              return Container(
-                                width: 100,
-                                height: 100,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: Image.file(
-                                    widget.photos[index],
-                                    fit: BoxFit.cover,
+                            children: List.generate(
+                              myTask[widget.selectedIndex].imagePath.length,
+                                  (index) {
+                                return Container(
+                                  width: 100,
+                                  height: 100,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              );
-                            }),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Image.file(
+                                      File(myTask[widget.selectedIndex].imagePath[index]),
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          color: Colors.grey[300],
+                                          child: const Icon(
+                                            Icons.broken_image,
+                                            size: 40,
+                                            color: Colors.grey,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ],
                       ),
@@ -542,7 +646,7 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                             ],
                           ),
                           const SizedBox(height: 16),
-                          widget.breakdownNotes.isEmpty
+                          myTask[widget.selectedIndex].breakdownItems.isEmpty
                               ? Container(
                             width: double.infinity,
                             padding: const EdgeInsets.all(20),
@@ -566,7 +670,7 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                           )
                               : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: widget.breakdownNotes.map((note) {
+                            children: myTask[widget.selectedIndex].breakdownItems.map((note) {
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 10),
                                 padding: const EdgeInsets.all(14),
@@ -652,7 +756,7 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                               border: Border.all(color: const Color(0xFFE2E8F0)),
                             ),
                             child: Text(
-                              widget.breakdownCauseBy.isEmpty ? 'Not provided' : widget.breakdownCauseBy,
+                              myTask[widget.selectedIndex].breakdownCausedBy.isEmpty ? 'Not provided' : myTask[widget.selectedIndex].breakdownCausedBy,
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -684,7 +788,7 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                             ],
                           ),
                           const SizedBox(height: 16),
-                          widget.consumedParts.isEmpty
+                          myTask[widget.selectedIndex].spareParts.isEmpty
                               ? Container(
                             width: double.infinity,
                             padding: const EdgeInsets.all(20),
@@ -752,7 +856,7 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                                   ),
                                 ),
                                 // Rows
-                                ...widget.consumedParts.asMap().entries.map((entry) {
+                                ...myTask[widget.selectedIndex].spareParts.asMap().entries.map((entry) {
                                   return Container(
                                     padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
                                     decoration: BoxDecoration(
@@ -766,7 +870,7 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                                         Expanded(
                                           flex: 3,
                                           child: Text(
-                                            entry.value['name'] ?? 'Unknown Part',
+                                            entry.value['item_name'] ?? 'Unknown Part',
                                             style: const TextStyle(
                                               fontSize: 14,
                                               color: Color(0xFF1E293B),
@@ -825,7 +929,7 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                               border: Border.all(color: const Color(0xFFE2E8F0)),
                             ),
                             child: Text(
-                              widget.technicianNotes.isEmpty ? 'Not provided' : widget.technicianNotes,
+                              myTask[widget.selectedIndex].technicianNotes.isEmpty ? 'Not provided' : myTask[widget.selectedIndex].technicianNotes,
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: Color(0xFF475569),
@@ -857,9 +961,9 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                             ],
                           ),
                           const SizedBox(height: 16),
-                          _buildCustomerField('Customer Name', widget.customerName ?? ''),
+                          _buildCustomerField('Customer Name', myTask[widget.selectedIndex].customerName ?? ''),
                           const SizedBox(height: 12),
-                          _buildCustomerField('Contact No.', widget.customerContact ?? ''),
+                          _buildCustomerField('Contact No.', myTask[widget.selectedIndex].customerContact ?? ''),
                         ],
                       ),
                     ),

@@ -11,6 +11,7 @@ class CardOutbox extends StatefulWidget {
   final String status; // 'pending_upload', 'uploading', 'failed'
   final DateTime savedAt;
   final String? errorMessage;
+  final Function(String swoNumber)? onRetryUpload; // Add callback for retry
 
   const CardOutbox({
     super.key,
@@ -22,6 +23,7 @@ class CardOutbox extends StatefulWidget {
     this.status = 'pending_upload',
     required this.savedAt,
     this.errorMessage,
+    this.onRetryUpload,
   });
 
   @override
@@ -29,35 +31,7 @@ class CardOutbox extends StatefulWidget {
 }
 
 class _CardOutboxState extends State<CardOutbox> {
-  // void _navigateToTaskScreen(BuildContext context) {
-  //   if (widget.taskType == 'BD') {
-  //     Navigator.push(
-  //       context,
-  //       MaterialPageRoute(
-  //         builder: (context) => SwoChecklistBD(
-  //           subtaskNumber: widget.swoNumber,
-  //           taskType: widget.taskType,
-  //           equipmentNo: widget.equipmentNo,
-  //           assignedDate: widget.assignedDate,
-  //           dept: widget.dept,
-  //         ),
-  //       ),
-  //     );
-  //   } else if (widget.taskType == 'PM') {
-  //     Navigator.push(
-  //       context,
-  //       MaterialPageRoute(
-  //         builder: (context) => SwoChecklistPM(
-  //           subtaskNumber: widget.swoNumber,
-  //           taskType: widget.taskType,
-  //           equipmentNo: widget.equipmentNo,
-  //           assignedDate: widget.assignedDate,
-  //           dept: widget.dept,
-  //         ),
-  //       ),
-  //     );
-  //   }
-  // }
+  bool _isRetrying = false;
 
   Color _getStatusColor() {
     switch (widget.status) {
@@ -103,7 +77,6 @@ class _CardOutboxState extends State<CardOutbox> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: GestureDetector(
-        // onTap: () => _navigateToTaskScreen(context),
         child: Container(
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
@@ -265,16 +238,17 @@ class _CardOutboxState extends State<CardOutbox> {
                   children: [
                     Expanded(
                       child: GestureDetector(
-                        onTap: () {
-                          // Retry upload action
-                          _retryUpload();
-                        },
+                        onTap: _isRetrying ? null : () => _retryUpload(),
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                            color: Color(0xff3498DB).withOpacity(0.1),
+                            color: _isRetrying
+                                ? Colors.grey.withOpacity(0.1)
+                                : Color(0xff3498DB).withOpacity(0.1),
                             border: Border.all(
-                              color: const Color(0xff3498DB),
+                              color: _isRetrying
+                                  ? Colors.grey
+                                  : const Color(0xff3498DB),
                               width: 2.0,
                             ),
                           ),
@@ -282,8 +256,21 @@ class _CardOutboxState extends State<CardOutbox> {
                             padding: const EdgeInsets.symmetric(
                                 vertical: 10.0, horizontal: 10.0),
                             child: Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                              child: _isRetrying
+                                  ? SizedBox(
+                                height: 18,
+                                width: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor:
+                                  AlwaysStoppedAnimation<Color>(
+                                    Color(0xff3498DB),
+                                  ),
+                                ),
+                              )
+                                  : Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.center,
                                 children: [
                                   Icon(
                                     Icons.refresh,
@@ -308,38 +295,6 @@ class _CardOutboxState extends State<CardOutbox> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: GestureDetector(
-                        // onTap: () => _navigateToTaskScreen(context),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Color(0xff16bd04).withOpacity(0.1),
-                            border: Border.all(
-                              color: const Color(0xFF07B31E),
-                              width: 2.0,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 20.0),
-                            child: Center(
-                              child: Text(
-                                "View Details",
-                                style: TextStyle(
-                                  color: Colors.green,
-                                  fontSize: 14,
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.w600,
-                                  height: 0,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ],
@@ -354,9 +309,132 @@ class _CardOutboxState extends State<CardOutbox> {
     return "${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}";
   }
 
-  void _retryUpload() {
-    // Implement retry upload logic
-    // This would trigger your upload service
-    print("Retrying upload for ${widget.swoNumber}");
+  Future<void> _retryUpload() async {
+    setState(() {
+      _isRetrying = true;
+    });
+
+    try {
+      // Call the callback if provided, or implement your upload logic here
+      if (widget.onRetryUpload != null) {
+        await widget.onRetryUpload!(widget.swoNumber);
+      } else {
+        // Simulate upload delay
+        await Future.delayed(Duration(seconds: 2));
+        // Your actual upload logic here
+      }
+
+      // Show success dialog
+      if (mounted) {
+        setState(() {
+          _isRetrying = false;
+        });
+        _showResultDialog(
+          title: 'Upload Successful',
+          message: 'Task ${widget.swoNumber} has been uploaded successfully.',
+          isSuccess: true,
+        );
+      }
+    } catch (e) {
+      // Show error dialog
+      if (mounted) {
+        setState(() {
+          _isRetrying = false;
+        });
+        _showResultDialog(
+          title: 'Upload Failed',
+          message: 'Failed to upload task ${widget.swoNumber}.\nError: ${e.toString()}',
+          isSuccess: false,
+        );
+      }
+    }
+  }
+
+  void _showResultDialog({
+    required String title,
+    required String message,
+    required bool isSuccess,
+  }) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: Row(
+            children: [
+              Icon(
+                isSuccess ? Icons.check_circle : Icons.error,
+                color: isSuccess ? Color(0xff07B31E) : Color(0xFFE74C3C),
+                size: 28,
+              ),
+              SizedBox(width: 10),
+              Text(
+                title,
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            message,
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 14,
+            ),
+          ),
+          actions: [
+            if (!isSuccess)
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            if (!isSuccess)
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _retryUpload();
+                },
+                child: Text(
+                  'Try Again',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xff3498DB),
+                  ),
+                ),
+              ),
+            if (isSuccess)
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close dialog
+                  Navigator.of(context).pop(); // Go back to dashboard
+                },
+                child: Text(
+                  'OK',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xff07B31E),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
   }
 }

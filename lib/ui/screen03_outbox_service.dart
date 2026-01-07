@@ -1,4 +1,3 @@
-// File: lib/screen03_outbox_service.dart
 
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -123,14 +122,6 @@ class OutboxService {
   Future<bool> syncTask(OutboxTask task) async {
     try {
       await updateTaskStatus(task.id, 'uploading');
-
-      // TODO: Replace this with your actual API call
-      // Example:
-      // final response = await http.post(
-      //   Uri.parse('YOUR_API_ENDPOINT'),
-      //   headers: {'Content-Type': 'application/json'},
-      //   body: jsonEncode(task.taskData),
-      // );
 
       // Simulate API call
       await Future.delayed(const Duration(seconds: 2));

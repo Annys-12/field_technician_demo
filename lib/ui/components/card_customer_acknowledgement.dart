@@ -1,5 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:field_technician_demo/app_data.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
@@ -10,7 +12,7 @@ import '../screen06_completed_breakdown.dart';
 import '../screen07_completed_preventive.dart';
 
 class CustomerAcknowledgmentPopup extends StatefulWidget {
-  final String subtaskNumber;
+  final String swoNumber;
   final String? customerName;
   final String? customerContact;
   final String taskType;
@@ -19,10 +21,12 @@ class CustomerAcknowledgmentPopup extends StatefulWidget {
   final String assignedDate;
   final Map<String, dynamic>? taskData; // Pass existing task data
   final VoidCallback onCancel;
+  final int selectedIndex;
+  Function saveTasks;
 
-  const CustomerAcknowledgmentPopup({
+  CustomerAcknowledgmentPopup({
     super.key,
-    this.subtaskNumber = '',
+    this.swoNumber = '',
     this.customerName = '',
     this.customerContact = '',
     required this.taskType,
@@ -31,6 +35,8 @@ class CustomerAcknowledgmentPopup extends StatefulWidget {
     this.assignedDate = '',
     this.taskData,
     required this.onCancel,
+    required this.selectedIndex,
+    required this.saveTasks
   });
 
   @override
@@ -132,6 +138,11 @@ class _CustomerAcknowledgmentPopupState
 
     setState(() {
       _isSubmitting = true;
+      myTask[widget.selectedIndex].customerName = _customerNameController.text.toString();
+      myTask[widget.selectedIndex].customerContact = _customerContactController.text.toString();
+
+      widget.saveTasks(myTask);
+
     });
 
     try {
@@ -158,13 +169,35 @@ class _CustomerAcknowledgmentPopupState
         if (mounted) {
           _showToast('Task submitted successfully!', isError: false);
           await Future.delayed(const Duration(seconds: 1));
+          myTask[widget.selectedIndex].status = "Completed";
+          myTask[widget.selectedIndex].timeEnd = DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.now());
+
+          final DateFormat fmt = DateFormat('dd-MM-yyyy HH:mm:ss');
+          DateTime startTime = fmt.parse(myTask[widget.selectedIndex].timeStart);
+          DateTime endTime   = fmt.parse(myTask[widget.selectedIndex].timeEnd);
+
+          Duration diff = endTime.difference(startTime);
+          double totalHours = diff.inMinutes / 60;
+
+          if(totalHours < 1){
+            myTask[widget.selectedIndex].duration = 1.toString();
+          }else{
+            myTask[widget.selectedIndex].duration = totalHours.toString();
+          }
+
+          widget.saveTasks(myTask);
+
           _navigateToCompletedScreen();
         }
       } else {
         // Save to outbox if offline
+
+        myTask[widget.selectedIndex].status = "Outbox";
+        widget.saveTasks(myTask);
+
         final outboxTask = OutboxTask(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
-          swoNumber: widget.subtaskNumber,
+          swoNumber: widget.swoNumber,
           taskType: widget.taskType,
           dept: widget.dept,
           equipmentNo: widget.equipmentNo,
@@ -226,6 +259,7 @@ class _CustomerAcknowledgmentPopupState
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => CompletedTaskBD(
+            /*
             subtaskNumber: widget.subtaskNumber,
             taskType: widget.taskType,
             equipmentNo: widget.equipmentNo,
@@ -233,6 +267,8 @@ class _CustomerAcknowledgmentPopupState
             dept: widget.dept,
             customerName: widget.customerName,
             customerContact: widget.customerContact,
+            */
+            selectedIndex: widget.selectedIndex,
             // Pass other required data from widget.taskData if needed
           ),
         ),
@@ -241,6 +277,7 @@ class _CustomerAcknowledgmentPopupState
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => CompletedTaskPM(
+            /*
             subtaskNumber: widget.subtaskNumber,
             taskType: widget.taskType,
             equipmentNo: widget.equipmentNo,
@@ -248,6 +285,8 @@ class _CustomerAcknowledgmentPopupState
             dept: widget.dept,
             customerName: widget.customerName,
             customerContact: widget.customerContact,
+            */
+            selectedIndex: widget.selectedIndex,
             // Pass other required data from widget.taskData if needed
           ),
         ),
@@ -277,15 +316,15 @@ class _CustomerAcknowledgmentPopupState
             Container(
               padding: const EdgeInsets.all(24),
               decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF0A4D8C),
-                      Color(0xFF0A57A3),
-                      Color(0xFF0D7AC4),
-                    ],
-                  ),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF0A4D8C),
+                    Color(0xFF0A57A3),
+                    Color(0xFF0D7AC4),
+                  ],
+                ),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(24),
                   topRight: Radius.circular(24),

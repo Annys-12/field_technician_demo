@@ -7,7 +7,13 @@ import '../helper.dart';
 
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+
+  LoginScreen({
+    super.key,
+    required this.saveTasks
+  });
+
+  Function saveTasks;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -37,7 +43,14 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             child: Column(
               children: [
-                const SizedBox(height: 200,),
+                const SizedBox(height: 120,),
+                Image.asset(
+                  'images/logo_field_tech.png',
+                  fit: BoxFit.fill,
+                  width: 100,
+                  height: 100,
+                ),
+                SizedBox(height: 12,),
                 Text(
                   "Field Technician - \n Task Report Apps",
                   style: TextStyle(
@@ -49,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 50,),
+                const SizedBox(height: 20,),
                 Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: Container(
@@ -152,6 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   Navigator.push(context, Helper().createRoute( DashboardScreen(
+                                    saveTasks: widget.saveTasks,
                                     )));
 
                                 },

@@ -167,7 +167,7 @@ class _ServiceChecklistScreenState extends State<ServiceChecklistScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => SubtaskServiceChecklist(
-                                subtaskName: subtask['description'],
+                                swoNumber: subtask['description'],
                                 taskType: widget.taskType,
                                 onComplete: () => updateSubtaskStatus(index),
                               ),

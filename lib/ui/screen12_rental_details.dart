@@ -14,9 +14,9 @@ class RentalDetailsScreen extends StatefulWidget {
   const RentalDetailsScreen({
     required this.swoNumber,
     required this.taskType,
-    this.rentalCompanyName = 'ABC Rental Sdn. Bhd.',
-    this.picName = 'Ahmed Ali',
-    this.picContact = '+60 12-345 6789',
+    required this.rentalCompanyName,
+    required this.picName,
+    required this.picContact,
     this.latitude,
     this.longitude,
     super.key,

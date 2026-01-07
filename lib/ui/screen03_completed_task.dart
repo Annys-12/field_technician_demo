@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../app_data.dart';
 import 'components/card_completed.dart';
 
 class CompletedTaskScreen extends StatefulWidget {
@@ -10,54 +11,6 @@ class CompletedTaskScreen extends StatefulWidget {
 }
 
 class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
-  // Dummy data for completed tasks
-  List<Map<String, String>> dummyCompletedTasks = [
-    {
-      'subtaskNumber': 'SWO-2024-101',
-      'taskType': 'BD',
-      'equipmentNo': 'EQ-54321',
-      'dept': 'EE',
-      'startDate': '2024-11-01',
-      'endDate': '2024-11-05',
-      'assignedDate': '2024-11-01',
-    },
-    {
-      'subtaskNumber': 'SWO-2024-102',
-      'taskType': 'PM',
-      'equipmentNo': 'EQ-98765',
-      'dept': 'ME',
-      'startDate': '2024-11-10',
-      'endDate': '2024-11-15',
-      'assignedDate': '2024-11-10',
-    },
-    {
-      'subtaskNumber': 'SWO-2024-103',
-      'taskType': 'BD',
-      'equipmentNo': 'EQ-44444',
-      'dept': 'EE',
-      'startDate': '2024-11-20',
-      'endDate': '2024-11-22',
-      'assignedDate': '2024-11-20',
-    },
-    {
-      'subtaskNumber': 'SWO-2024-104',
-      'taskType': 'PM',
-      'equipmentNo': 'EQ-55555',
-      'dept': 'ME',
-      'startDate': '2024-12-01',
-      'endDate': '2024-12-05',
-      'assignedDate': '2024-12-01',
-    },
-    {
-      'subtaskNumber': 'SWO-2024-105',
-      'taskType': 'BD',
-      'equipmentNo': 'EQ-66666',
-      'dept': 'EE',
-      'startDate': '2024-12-10',
-      'endDate': '2024-12-12',
-      'assignedDate': '2024-12-10',
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -172,17 +125,23 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
                   child: ListView.builder(
                     padding: EdgeInsets.zero,
                     shrinkWrap: true,
-                    itemCount: dummyCompletedTasks.length,
+                    itemCount: myTask.length,
                     itemBuilder: (context, index) {
-                      return CardCompletedTask(
-                        subtaskNumber: dummyCompletedTasks[index]['subtaskNumber'] ?? '',
-                        equipmentNo: dummyCompletedTasks[index]['equipmentNo'] ?? '',
-                        taskType: dummyCompletedTasks[index]['taskType'] ?? '',
-                        dept: dummyCompletedTasks[index]['dept'] ?? '',
-                        startDate: dummyCompletedTasks[index]['startDate'] ?? '',
-                        endDate: dummyCompletedTasks[index]['endDate'] ?? '',
-                        assignedDate: dummyCompletedTasks[index]['assignedDate'] ?? '',
-                      );
+                      if(myTask[index].status == "Completed"){
+                        return CardCompletedTask(
+                          swoNumber: myTask[index].swoNumber ?? '',
+                          equipmentNo: myTask[index].equipmentId ?? '',
+                          taskType: myTask[index].taskType ?? '',
+                          dept: myTask[index].dept?? '',
+                          startDate: myTask[index].timeStart ?? '',
+                          endDate: myTask[index].timeEnd ?? '',
+                          assignedDate: myTask[index].assignedDate ?? '',
+                          selectedIndex: index,
+                        );
+                      }else {
+                        return SizedBox();
+                      }
+
                     },
                   ),
                 ),
