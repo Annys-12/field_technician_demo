@@ -12,10 +12,12 @@ import '../helper.dart';
 class DashboardScreen extends StatefulWidget {
   DashboardScreen({
     super.key,
-    required this.saveTasks
+    required this.saveTasks,
+    required this.saveOutboxTasks,
   });
 
   Function saveTasks;
+  Function saveOutboxTasks;
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -33,6 +35,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
   }
 
+  // refreshTask(){
+  //   setState(() {
+  //     myTask.length;
+  //
+  //     intPendingTask = 0;
+  //     intCompleteTask = 0;
+  //     intOutboxTask = 0;
+  //     intAssignedTask = 0;
+  //
+  //     for(var i in myTask){
+  //       switch(i.status){
+  //         case "In Progress":
+  //           intPendingTask += 1;
+  //           break;
+  //         case "Paused":
+  //           intPendingTask += 1;
+  //           break;
+  //         case "Completed":
+  //           intCompleteTask += 1;
+  //           break;
+  //         case "Outbox":
+  //           intOutboxTask += 1;
+  //           break;
+  //         default:
+  //           intAssignedTask += 1;
+  //           break;
+  //       }
+  //     }
+  //
+  //     for (int i = 0; i < myTask.length; i++) {
+  //       if(myTask[i].status == "In Progress"){
+  //         isGotCurrentTask = true;
+  //         intCurrentTask = i;
+  //         break;
+  //       }
+  //     }
+  //   });
+  // }
   refreshTask(){
     setState(() {
       myTask.length;
@@ -42,6 +82,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       intOutboxTask = 0;
       intAssignedTask = 0;
 
+      // Count tasks from myTask
       for(var i in myTask){
         switch(i.status){
           case "In Progress":
@@ -53,15 +94,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
           case "Completed":
             intCompleteTask += 1;
             break;
-          case "Outbox":
-            intOutboxTask += 1;
-            break;
           default:
             intAssignedTask += 1;
             break;
         }
       }
 
+      // Count outbox tasks from myOutboxTask list
+      intOutboxTask = myOutboxTask.length;
+
+      // Check for current task
+      isGotCurrentTask = false;
       for (int i = 0; i < myTask.length; i++) {
         if(myTask[i].status == "In Progress"){
           isGotCurrentTask = true;
@@ -138,6 +181,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     context,
                                     MaterialPageRoute(builder: (context) => LoginScreen(
                                       saveTasks: widget.saveTasks,
+                                      saveOutboxTasks: widget.saveOutboxTasks,
                                     )),
                                         (route) => false,
                                   );
@@ -332,8 +376,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 Navigator.push(
                                   context,
                                   Helper().createRoute(OutboxScreen(
-                                    // saveTasks: widget.saveTasks,
-                                    // refreshTask: refreshTask,
+                                    saveOutboxTasks: widget.saveOutboxTasks,
+                                    saveTasks: widget.saveTasks,
+                                    refreshDashboard: refreshTask,
                                   )),
                                 );
                               },

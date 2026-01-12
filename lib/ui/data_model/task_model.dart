@@ -1,3 +1,5 @@
+import 'outbox_model.dart';
+
 class TaskModel {
   final String id;
   final String swoNumber;
@@ -12,8 +14,8 @@ class TaskModel {
   String assignedDate;
   DateTime savedAt;
   String status;
-  final String? errorMessage;
-  final int retryCount;
+  late final String? errorMessage;
+  late final int retryCount;
   List<String> imagePath;
   List<Map<String, dynamic>> spareParts;
   List<Map<String, dynamic>> serviceChecklist;
@@ -25,6 +27,8 @@ class TaskModel {
   String hourMeter2;
   String customerName;
   String customerContact;
+  String startDate;
+  String endDate;
 
   TaskModel({
     required this.id,
@@ -52,7 +56,9 @@ class TaskModel {
     required this.hourMeter1,
     required this.hourMeter2,
     required this.customerName,
-    required this.customerContact
+    required this.customerContact,
+    this.startDate = '',
+    this.endDate = '',
   });
 
   Map<String, dynamic> toJson() {
@@ -82,7 +88,9 @@ class TaskModel {
       'hourMeter1': hourMeter1,
       'hourMeter2': hourMeter2,
       'customerName': customerName,
-      'customerContact': customerContact
+      'customerContact': customerContact,
+      'startDate': startDate,
+      'endDate': endDate,
 
     };
   }
@@ -124,9 +132,12 @@ class TaskModel {
       hourMeter2: json['hourMeter2'] as String,
       customerName: json['customerName'] as String,
       customerContact: json['customerContact'] as String,
+      startDate: json['startDate'] as String? ?? '',
+      endDate: json['endDate'] as String? ?? '',
     );
   }
 }
+
 
 class CompanyInfo {
   final String rentalCompany;

@@ -229,7 +229,7 @@ class OutboxService {
   }
 
   // Auto-sync when connection is restored
-  void startAutoSync([Function(Map<String, dynamic>)? onSyncComplete]) {
+  void startAutoSync([Function(Map<String, dynamic>)? onSyncComplete])  {
     Connectivity().onConnectivityChanged.listen((result) async {
       if (result != ConnectivityResult.none) {
         final syncResult = await syncAllTasks();

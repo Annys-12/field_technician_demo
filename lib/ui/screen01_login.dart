@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:developer';
 
+import '../app_data.dart';
 import '../helper.dart';
 
 
@@ -10,10 +11,12 @@ class LoginScreen extends StatefulWidget {
 
   LoginScreen({
     super.key,
-    required this.saveTasks
+    required this.saveTasks,
+    required this.saveOutboxTasks,
   });
 
   Function saveTasks;
+  final Function saveOutboxTasks;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -166,7 +169,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 onPressed: () {
                                   Navigator.push(context, Helper().createRoute( DashboardScreen(
                                     saveTasks: widget.saveTasks,
-                                    )));
+                                    saveOutboxTasks: widget.saveOutboxTasks,
+                                  )));
 
                                 },
                                 style: ButtonStyle(
@@ -197,8 +201,27 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                     ),
+
                   ),
-                )
+                ),
+                const Spacer(), // Pushes the version text to the bottom
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0, right: 15.0),
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: Text(
+                      appVersion,
+                      style: TextStyle(
+                        decoration: TextDecoration.none,
+                        color: Colors.white,
+                        fontFamily: 'Poppins',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      textAlign: TextAlign.end,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

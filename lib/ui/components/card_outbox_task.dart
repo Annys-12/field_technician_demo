@@ -8,6 +8,8 @@ class CardOutbox extends StatefulWidget {
   final String dept;
   final String equipmentNo;
   final String assignedDate;
+  final String timeStart;
+  final String timeEnd;
   final String status; // 'pending_upload', 'uploading', 'failed'
   final DateTime savedAt;
   final String? errorMessage;
@@ -20,6 +22,8 @@ class CardOutbox extends StatefulWidget {
     required this.dept,
     required this.equipmentNo,
     required this.assignedDate,
+    required this.timeStart,
+    required this.timeEnd,
     this.status = 'pending_upload',
     required this.savedAt,
     this.errorMessage,
@@ -168,23 +172,51 @@ class _CardOutboxState extends State<CardOutbox> {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  widget.assignedDate,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey,
-                  ),
+                const SizedBox(height: 8),
+                // Assigned Date and Time Range
+                Row(
+                  children: [
+                    Icon(Icons.calendar_today, size: 14, color: Colors.grey),
+                    SizedBox(width: 4),
+                    Text(
+                      "Assigned: ${widget.assignedDate}",
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  "Saved: ${_formatDateTime(widget.savedAt)}",
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey,
-                  ),
+                // Row(
+                //   children: [
+                //     Icon(Icons.access_time, size: 14, color: Colors.grey),
+                //     SizedBox(width: 4),
+                //     Text(
+                //       "${widget.timeStart} - ${widget.timeEnd}",
+                //       style: const TextStyle(
+                //         fontSize: 13,
+                //         fontWeight: FontWeight.w500,
+                //         color: Colors.grey,
+                //       ),
+                //     ),
+                //   ],
+                // ),
+                // const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(Icons.save, size: 14, color: Colors.grey),
+                    SizedBox(width: 4),
+                    Text(
+                      "Saved: ${_formatDateTime(widget.savedAt)}",
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
                 // Status indicator
@@ -224,13 +256,21 @@ class _CardOutboxState extends State<CardOutbox> {
                 ),
                 if (widget.errorMessage != null) ...[
                   const SizedBox(height: 4),
-                  Text(
-                    "Error: ${widget.errorMessage}",
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.red,
-                    ),
+                  Row(
+                    children: [
+                      Icon(Icons.error_outline, size: 14, color: Colors.red),
+                      SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          widget.errorMessage!,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
                 const SizedBox(height: 12),
