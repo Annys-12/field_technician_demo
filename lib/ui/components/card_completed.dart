@@ -64,6 +64,7 @@ class _CardCompletedTaskState extends State<CardCompletedTask> {
             dept: widget.dept,
             */
             selectedIndex: widget.selectedIndex,
+            isFromCompletedTask: true,
           ),
         ),
       );
@@ -80,6 +81,7 @@ class _CardCompletedTaskState extends State<CardCompletedTask> {
             dept: widget.dept,
             */
             selectedIndex: widget.selectedIndex,
+            isFromCompletedTask: true,
           ),
         ),
       );

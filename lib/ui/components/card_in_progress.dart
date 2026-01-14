@@ -232,6 +232,8 @@ class _CardInProgressState extends State<CardInProgress> {
                                 swoNumber: widget.swoNumber,
                                 taskType: widget.taskType,
                                 spareParts: myTask[widget.selectedIndex].spareParts,
+                                selectedIndex: widget.selectedIndex,
+                                saveTasks: widget.saveTasks,
                               ),
                             ),
                           );

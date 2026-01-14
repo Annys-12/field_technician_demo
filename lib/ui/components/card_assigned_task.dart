@@ -190,6 +190,8 @@ class _CardAssignedTaskState extends State<CardAssignedTask> {
                                 swoNumber: widget.swoNumber,
                                 taskType: widget.taskType,
                                 spareParts: myTask[widget.selectedIndex].spareParts,
+                                selectedIndex: widget.selectedIndex,
+                                saveTasks: widget.saveTasks,
                               ),
                             ),
                           );

@@ -5,6 +5,7 @@ import 'dart:io';
 class CompletedTaskBD extends StatefulWidget {
 
   final int selectedIndex;
+  final bool isFromCompletedTask;
   /*
   final String subtaskNumber;
   final String taskType;
@@ -31,6 +32,7 @@ class CompletedTaskBD extends StatefulWidget {
   const CompletedTaskBD({
     super.key,
     required this.selectedIndex,
+    this.isFromCompletedTask = false,
     /*
     this.subtaskNumber = '',
     this.taskType = '',
@@ -121,7 +123,18 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                           IconButton(
                             icon: const Icon(Icons.arrow_back_ios_new,
                                 color: Colors.white, size: 20),
-                            onPressed: () => Navigator.pop(context),
+                            onPressed: () {
+                              if (widget.isFromCompletedTask) {
+                                // If coming from completed task, pop only once
+                                Navigator.pop(context);
+                              } else {
+                                // If coming from submit flow, pop 4 times
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                              }
+                            },
                           ),
                           const SizedBox(width: 8),
                           Expanded(
@@ -213,7 +226,7 @@ class _CompletedTaskBDState extends State<CompletedTaskBD> {
                                   _buildDetailRow('SWO Type', myTask[widget.selectedIndex].taskType),
                                   _buildDetailRow('SWO No.', myTask[widget.selectedIndex].swoNumber),
                                   _buildDetailRow('Assigned Date', myTask[widget.selectedIndex].assignedDate),
-                                  _buildDetailRow('Department', myTask[widget.selectedIndex].dept),
+                                  _buildDetailRow('PIC Remarks', myTask[widget.selectedIndex].technicianNotes),
                                 ],
                               ),
                             ),

@@ -98,10 +98,14 @@ class _SubmitFormState extends State<SubmitForm> {
   }
 
   bool _validateForm() {
-    // Check if all quantities are filled
+    // Check if all quantities are filled (allow 0 as valid input)
     for (var i = 0; i < widget.spareParts.length; i++) {
       String value = _quantityControllers['$i']?.text.trim() ?? '';
-      if (value.isEmpty || value == '0') {
+      if (value.isEmpty) {
+        return false;
+      }
+      // Check if the value is a valid number
+      if (int.tryParse(value) == null) {
         return false;
       }
     }

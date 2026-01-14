@@ -692,8 +692,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  // Add these functions to your _MyHomePageState class in main.dart
-
   addDummyData(){
     myTask.add(TaskModel(
         id: 'Task1',
@@ -1202,14 +1200,14 @@ class _MyHomePageState extends State<MyHomePage> {
         dept: 'EE',
         equipmentId: 'PG02088',
         assignedDate: '17/12/2025',
-        savedAt: DateTime.now().subtract(Duration(hours: 2)),
+        savedAt: DateTime.now(),
         status: "pending_upload",
-        timeStart: '08:30',
-        timeEnd: '11:45',
-        duration: '3.25',
+        timeStart: '17-12-2025 08:30:00',
+        timeEnd: '27-12-2025 11:30:00',
+        duration: '7',
         pauseTime: '0',
         pauseReason: '-',
-        startDate: '17-12-2024 08:30:00',
+        startDate: '17-12-2025',
         endDate: '',
         imagePath: [],
         spareParts: [
@@ -1235,7 +1233,7 @@ class _MyHomePageState extends State<MyHomePage> {
             latitude: 3.074118505289,
             longitude: 101.6251485159
         ),
-        breakdownCausedBy: "Brake wear",
+        breakdownCausedBy: "Customer/User",
         breakdownItems: [],
         technicianNotes: "Replaced brake pads and checked hydraulic system",
         hourMeter1: "1250",
@@ -1252,16 +1250,16 @@ class _MyHomePageState extends State<MyHomePage> {
         dept: 'ME',
         equipmentId: 'EQ-22456',
         assignedDate: '16/12/2025',
-        savedAt: DateTime.now().subtract(Duration(days: 1)),
+        savedAt: DateTime.now(),
         status: "failed",
         errorMessage: "Network timeout - Unable to reach server",
         retryCount: 2,
-        timeStart: '14:00',
-        timeEnd: '17:30',
-        duration: '3.5',
-        pauseTime: '15',
+        timeStart: '16-12-2025 09:30:00',
+        timeEnd: '24-12-2024 08:30:00',
+        duration: '3',
+        pauseTime: '18-12-2024 08:30:00',
         pauseReason: 'Waiting for spare parts',
-        startDate: '16-12-2024 14:00:00',
+        startDate: '16-12-2025',
         endDate: '',
         imagePath: [],
         spareParts: [
@@ -1288,7 +1286,7 @@ class _MyHomePageState extends State<MyHomePage> {
             latitude: 3.074118505289,
             longitude: 101.6251485159
         ),
-        breakdownCausedBy: "",
+        breakdownCausedBy: "Customer/User",
         breakdownItems: [],
         technicianNotes: "Regular preventive maintenance completed",
         hourMeter1: "2100",
@@ -1305,11 +1303,11 @@ class _MyHomePageState extends State<MyHomePage> {
         dept: 'EE',
         equipmentId: 'PG02091',
         assignedDate: '15/12/2025',
-        savedAt: DateTime.now().subtract(Duration(hours: 8)),
+        savedAt: DateTime.now(),
         status: "pending_upload",
-        timeStart: '09:00',
-        timeEnd: '10:30',
-        duration: '1.5',
+        timeStart: '15-12-2024 09:00:00',
+        timeEnd: '20-12-2024 08:30:00',
+        duration: '2',
         pauseTime: '0',
         pauseReason: '-',
         startDate: '15-12-2024 09:00:00',
@@ -1333,7 +1331,7 @@ class _MyHomePageState extends State<MyHomePage> {
             latitude: 3.074118505289,
             longitude: 101.6251485159
         ),
-        breakdownCausedBy: "Hydraulic leak",
+        breakdownCausedBy: "Vendor/Provider",
         breakdownItems: [],
         technicianNotes: "Fixed hydraulic hose connection",
         hourMeter1: "3400",
@@ -1354,12 +1352,12 @@ class _MyHomePageState extends State<MyHomePage> {
         status: "failed",
         errorMessage: "Server error 500 - Upload failed",
         retryCount: 3,
-        timeStart: '11:15',
-        timeEnd: '14:45',
-        duration: '3.5',
-        pauseTime: '20',
-        pauseReason: 'Lunch break',
-        startDate: '14-12-2024 11:15:00',
+        timeStart: '14-12-2025 08:55:00',
+        timeEnd: '19-12-2025 17:30:00',
+        duration: '1',
+        pauseTime: '15-12-2025 13:00:00',
+        pauseReason: 'On break',
+        startDate: '14-12-2024',
         endDate: '',
         imagePath: [],
         spareParts: [
@@ -1391,7 +1389,7 @@ class _MyHomePageState extends State<MyHomePage> {
             latitude: 3.074118505289,
             longitude: 101.6251485159
         ),
-        breakdownCausedBy: "Engine overheating",
+        breakdownCausedBy: "Vendor/Provider",
         breakdownItems: [],
         technicianNotes: "Replaced coolant and belts, fixed brake system",
         hourMeter1: "4500",
@@ -1410,12 +1408,12 @@ class _MyHomePageState extends State<MyHomePage> {
         assignedDate: '13/12/2025',
         savedAt: DateTime.now().subtract(Duration(minutes: 45)),
         status: "pending_upload",
-        timeStart: '15:30',
-        timeEnd: '17:00',
-        duration: '1.5',
+        timeStart: '13-12-2025 08:30:00',
+        timeEnd: '17-12-2025 08:30:00',
+        duration: '2',
         pauseTime: '0',
         pauseReason: '-',
-        startDate: '13-12-2024 15:30:00',
+        startDate: '13-12-2024',
         endDate: '',
         imagePath: [],
         spareParts: [
@@ -1441,7 +1439,7 @@ class _MyHomePageState extends State<MyHomePage> {
             latitude: 3.074118505289,
             longitude: 101.6251485159
         ),
-        breakdownCausedBy: "",
+        breakdownCausedBy: "Customer/User",
         breakdownItems: [],
         technicianNotes: "Routine preventive maintenance - all systems OK",
         hourMeter1: "5200",
@@ -1479,32 +1477,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  // refreshTask(){
-  //   intPendingTask = 0;
-  //   intCompleteTask = 0;
-  //   intOutboxTask = 0;
-  //   intAssignedTask = 0;
-  //
-  //   for(var i in myTask){
-  //     switch(i.status){
-  //       case "In Progress":
-  //         intPendingTask += 1;
-  //         break;
-  //       case "Paused":
-  //         intPendingTask += 1;
-  //         break;
-  //       case "Completed":
-  //         intCompleteTask += 1;
-  //         break;
-  //       default:
-  //         intAssignedTask += 1;
-  //         break;
-  //     }
-  //   }
-  //
-  //   // Count outbox tasks
-  //   intOutboxTask = myOutboxTask.length;
-  // }
   refreshTask(){
     intPendingTask = 0;
     intCompleteTask = 0;

@@ -6,7 +6,7 @@ List<TaskModel> myTask = [];
 List<TaskModel> myOutboxTask = [];
 const String outboxTaskKey = 'outbox_tasks';
 
-String appVersion = "v2";
+String appVersion = "v4";
 
 int TASK_ASSIGNED = 0;
 int TASK_PENDING = 1;

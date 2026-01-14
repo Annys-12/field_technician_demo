@@ -1693,7 +1693,7 @@ class _SwoChecklistBDState extends State<SwoChecklistBD> {
 
   // Breakdown notes
   //final List<Map<String, String>> _breakdownNotes = [];
-  bool _isTTLSelected = false;
+  bool _isVendorSelected = false;
   bool _isCustomerSelected = false;
 
   /*
@@ -2045,6 +2045,8 @@ class _SwoChecklistBDState extends State<SwoChecklistBD> {
                                     swoNumber: widget.subtaskNumber,
                                     taskType: widget.taskType,
                                     spareParts: myTask[widget.selectedIndex].spareParts,
+                                    selectedIndex: widget.selectedIndex,
+                                    saveTasks: widget.saveTasks,
                                     /*
                                     spareParts: [
                                       {
@@ -2585,9 +2587,9 @@ class _SwoChecklistBDState extends State<SwoChecklistBD> {
                             myTask[widget.selectedIndex].hourMeter2 = hourMeter2Controller.text.toString();
 
                             if(_isCustomerSelected){
-                              myTask[widget.selectedIndex].breakdownCausedBy = "Customer";
+                              myTask[widget.selectedIndex].breakdownCausedBy = "Customer/User";
                             }else{
-                              myTask[widget.selectedIndex].breakdownCausedBy = "TTL";
+                              myTask[widget.selectedIndex].breakdownCausedBy = "Vendor/Provider";
                             }
 
                             widget.saveTasks(myTask);
@@ -2957,10 +2959,10 @@ class _SwoChecklistBDState extends State<SwoChecklistBD> {
             ),
           ),
           const SizedBox(height: 8),
-          _buildCheckbox('TTL', _isTTLSelected, (value) {
-            setState(() => _isTTLSelected = value ?? false);
+          _buildCheckbox('Vendor/Provider', _isVendorSelected, (value) {
+            setState(() => _isVendorSelected = value ?? false);
           }),
-          _buildCheckbox('Customer', _isCustomerSelected, (value) {
+          _buildCheckbox('Customer/User', _isCustomerSelected, (value) {
             setState(() => _isCustomerSelected = value ?? false);
           }),
         ],

@@ -383,7 +383,9 @@ class _CardOutboxState extends State<CardOutbox> {
         });
         _showResultDialog(
           title: 'Upload Failed',
-          message: 'Failed to upload task ${widget.swoNumber}.\nError: ${e.toString()}',
+          message: 'Failed to upload task ${widget.swoNumber}'
+              // '.\nError: ${e.toString()}'
+          ,
           isSuccess: false,
         );
       }

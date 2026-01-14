@@ -19,49 +19,41 @@ class AssignedTaskScreen extends StatefulWidget {
 }
 
 class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
-  // Dummy data for assigned tasks
-  // List<Map<String, String>> dummyTasks = [
-  //   {
-  //     'subtaskNumber': 'SWO-2024-001',
-  //     'taskType': 'BD',
-  //     'equipmentNo': 'EQ-12345',
-  //     'assignedDate': '2025-12-17',
-  //     'dept': 'EE',
-  //   },
-  //   {
-  //     'subtaskNumber': 'SWO-2024-002',
-  //     'taskType': 'PM',
-  //     'equipmentNo': 'EQ-67890',
-  //     'assignedDate': '2025-12-16',
-  //     'dept': 'ME',
-  //   },
-  //   {
-  //     'subtaskNumber': 'SWO-2024-003',
-  //     'taskType': 'BD',
-  //     'equipmentNo': 'EQ-11111',
-  //     'assignedDate': '2025-12-15',
-  //     'dept': 'EE',
-  //   },
-  //   {
-  //     'subtaskNumber': 'SWO-2024-004',
-  //     'taskType': 'PM',
-  //     'equipmentNo': 'EQ-22222',
-  //     'assignedDate': '2025-12-14',
-  //     'dept': 'ME',
-  //   },
-  //   {
-  //     'subtaskNumber': 'SWO-2024-005',
-  //     'taskType': 'BD',
-  //     'equipmentNo': 'EQ-33333',
-  //     'assignedDate': '2025-12-13',
-  //     'dept': 'EE',
-  //   },
-  // ];
+  final TextEditingController _searchController = TextEditingController();
+  List filteredTasks = [];
 
   @override
   void initState() {
     print("ListSize: ${myTask.length}");
+    filteredTasks = myTask;
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterTasks(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        filteredTasks = myTask;
+      } else {
+        filteredTasks = myTask.where((task) {
+          final swoNumber = task.swoNumber?.toLowerCase() ?? '';
+          final taskType = task.taskType?.toLowerCase() ?? '';
+          final equipmentId = task.equipmentId?.toLowerCase() ?? '';
+          final dept = task.dept?.toLowerCase() ?? '';
+          final searchLower = query.toLowerCase();
+
+          return swoNumber.contains(searchLower) ||
+              taskType.contains(searchLower) ||
+              equipmentId.contains(searchLower) ||
+              dept.contains(searchLower);
+        }).toList();
+      }
+    });
   }
 
   refreshList(){
@@ -73,6 +65,7 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -91,86 +84,90 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
                     ],
                   ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Column(
-                    children: [
-                      Spacer(),
-                      Row(
+                child: SafeArea(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          IconButton(
-                            icon: const Icon(
-                              Icons.arrow_back_ios,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              widget.refreshTask();
-                              Navigator.pop(context);
-                            },
-                          ),
-                          Expanded(
-                            child: Center(
-                              child: Text(
-                                "Assigned Task",
-                                style: TextStyle(
+                          SizedBox(height: 10),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.arrow_back_ios,
                                   color: Colors.white,
-                                  fontSize: 18,
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.w700,
-                                  height: 0,
+                                ),
+                                onPressed: () {
+                                  widget.refreshTask();
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              Expanded(
+                                child: Center(
+                                  child: Text(
+                                    "Assigned Task",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w700,
+                                      height: 0,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 40),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    spreadRadius: 1,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: TextField(
+                                controller: _searchController,
+                                onChanged: _filterTasks,
+                                decoration: InputDecoration(
+                                  hintText: 'Search',
+                                  hintStyle: const TextStyle(
+                                    color: Colors.grey,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                  suffixIcon: Icon(Icons.search),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide.none,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                          SizedBox(width: 40),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                spreadRadius: 1,
-                                blurRadius: 8,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: TextField(
-                            onChanged: (val) {
-                              // Search functionality placeholder
-                            },
-                            decoration: InputDecoration(
-                              hintText: 'Search',
-                              hintStyle: const TextStyle(
-                                color: Colors.grey,
-                                fontStyle: FontStyle.italic,
-                              ),
-                              suffixIcon: Icon(Icons.search),
-                              filled: true,
-                              fillColor: Colors.white,
-                              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -184,15 +181,15 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
                   child: ListView.builder(
                     padding: EdgeInsets.zero,
                     shrinkWrap: true,
-                    itemCount: myTask.length,
+                    itemCount: filteredTasks.length,
                     itemBuilder: (context, index) {
-                      if(myTask[index].status == "New Task"){
+                      if(filteredTasks[index].status == "New Task"){
                         return CardAssignedTask(
-                          swoNumber: myTask[index].swoNumber ?? '',
-                          taskType: myTask[index].taskType ?? '',
-                          equipmentNo: myTask[index].equipmentId ?? '',
-                          assignedDate: myTask[index].assignedDate ?? '',
-                          dept: myTask[index].dept ?? '',
+                          swoNumber: filteredTasks[index].swoNumber ?? '',
+                          taskType: filteredTasks[index].taskType ?? '',
+                          equipmentNo: filteredTasks[index].equipmentId ?? '',
+                          assignedDate: filteredTasks[index].assignedDate ?? '',
+                          dept: filteredTasks[index].dept ?? '',
                           selectedIndex: index,
                           saveTasks: widget.saveTasks,
                           refreshList: refreshList,
@@ -200,7 +197,6 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
                       }else{
                         return SizedBox();
                       }
-
                     },
                   ),
                 ),

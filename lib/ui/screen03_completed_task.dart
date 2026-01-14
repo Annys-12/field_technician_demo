@@ -11,10 +11,46 @@ class CompletedTaskScreen extends StatefulWidget {
 }
 
 class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  List filteredTasks = [];
+
+  @override
+  void initState() {
+    filteredTasks = myTask;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterTasks(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        filteredTasks = myTask;
+      } else {
+        filteredTasks = myTask.where((task) {
+          final swoNumber = task.swoNumber?.toLowerCase() ?? '';
+          final taskType = task.taskType?.toLowerCase() ?? '';
+          final equipmentId = task.equipmentId?.toLowerCase() ?? '';
+          final dept = task.dept?.toLowerCase() ?? '';
+          final searchLower = query.toLowerCase();
+
+          return swoNumber.contains(searchLower) ||
+              taskType.contains(searchLower) ||
+              equipmentId.contains(searchLower) ||
+              dept.contains(searchLower);
+        }).toList();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -33,85 +69,89 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
                     ],
                   ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Column(
-                    children: [
-                      Spacer(),
-                      Row(
+                child: SafeArea(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          IconButton(
-                            icon: const Icon(
-                              Icons.arrow_back_ios,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                          Expanded(
-                            child: Center(
-                              child: Text(
-                                "Complete Task",
-                                style: TextStyle(
+                          SizedBox(height: 10),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.arrow_back_ios,
                                   color: Colors.white,
-                                  fontSize: 18,
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.w700,
-                                  height: 0,
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              Expanded(
+                                child: Center(
+                                  child: Text(
+                                    "Complete Task",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w700,
+                                      height: 0,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 40),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    spreadRadius: 1,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: TextField(
+                                controller: _searchController,
+                                onChanged: _filterTasks,
+                                decoration: InputDecoration(
+                                  hintText: 'Search',
+                                  hintStyle: const TextStyle(
+                                    color: Colors.grey,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                  suffixIcon: Icon(Icons.search),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide.none,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                          SizedBox(width: 40),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                spreadRadius: 1,
-                                blurRadius: 8,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: TextField(
-                            onChanged: (val) {
-                              // Search functionality placeholder
-                            },
-                            decoration: InputDecoration(
-                              hintText: 'Search',
-                              hintStyle: const TextStyle(
-                                color: Colors.grey,
-                                fontStyle: FontStyle.italic,
-                              ),
-                              suffixIcon: Icon(Icons.search),
-                              filled: true,
-                              fillColor: Colors.white,
-                              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -125,23 +165,22 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
                   child: ListView.builder(
                     padding: EdgeInsets.zero,
                     shrinkWrap: true,
-                    itemCount: myTask.length,
+                    itemCount: filteredTasks.length,
                     itemBuilder: (context, index) {
-                      if(myTask[index].status == "Completed"){
+                      if(filteredTasks[index].status == "Completed"){
                         return CardCompletedTask(
-                          swoNumber: myTask[index].swoNumber ?? '',
-                          equipmentNo: myTask[index].equipmentId ?? '',
-                          taskType: myTask[index].taskType ?? '',
-                          dept: myTask[index].dept?? '',
-                          startDate: myTask[index].timeStart ?? '',
-                          endDate: myTask[index].timeEnd ?? '',
-                          assignedDate: myTask[index].assignedDate ?? '',
+                          swoNumber: filteredTasks[index].swoNumber ?? '',
+                          equipmentNo: filteredTasks[index].equipmentId ?? '',
+                          taskType: filteredTasks[index].taskType ?? '',
+                          dept: filteredTasks[index].dept?? '',
+                          startDate: filteredTasks[index].timeStart ?? '',
+                          endDate: filteredTasks[index].timeEnd ?? '',
+                          assignedDate: filteredTasks[index].assignedDate ?? '',
                           selectedIndex: index,
                         );
                       }else {
                         return SizedBox();
                       }
-
                     },
                   ),
                 ),

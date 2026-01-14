@@ -29,6 +29,7 @@ class TaskModel {
   String customerContact;
   String startDate;
   String endDate;
+  bool isPartsRequested = false;
 
   TaskModel({
     required this.id,
@@ -59,6 +60,7 @@ class TaskModel {
     required this.customerContact,
     this.startDate = '',
     this.endDate = '',
+    this.isPartsRequested = false,
   });
 
   Map<String, dynamic> toJson() {
@@ -91,6 +93,7 @@ class TaskModel {
       'customerContact': customerContact,
       'startDate': startDate,
       'endDate': endDate,
+      'isPartsRequested': isPartsRequested,
 
     };
   }
@@ -134,6 +137,7 @@ class TaskModel {
       customerContact: json['customerContact'] as String,
       startDate: json['startDate'] as String? ?? '',
       endDate: json['endDate'] as String? ?? '',
+      isPartsRequested: json['isPartsRequested'] as bool? ?? false,
     );
   }
 }

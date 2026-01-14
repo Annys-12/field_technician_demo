@@ -125,6 +125,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             children: [
               // Header Section
+              // Header Section
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -146,10 +147,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          // User name with decoration
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Muhammad',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Refresh and Logout buttons
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               IconButton(
                                 icon: Icon(
@@ -164,10 +189,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 },
                                 tooltip: 'Refresh',
                               ),
-                            ],
-                          ),
-                          Row(
-                            children: [
                               IconButton(
                                 icon: Icon(
                                   Icons.logout,
@@ -175,135 +196,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   size: 22,
                                 ),
                                 onPressed: () {
-                                  Navigator.pop(context); // Close dialog
                                   // Navigate to login page and remove all previous routes
                                   Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(builder: (context) => LoginScreen(
-                                      saveTasks: widget.saveTasks,
-                                      saveOutboxTasks: widget.saveOutboxTasks,
-                                    )),
+                                        saveTasks: widget.saveTasks,
+                                        saveOutboxTasks: widget.saveOutboxTasks,
+                                      )
+                                    ),
                                         (route) => false,
                                   );
-                                  // Row(
-                                  //   mainAxisAlignment: MainAxisAlignment.end,
-                                  //   children: [
-                                  //     Container(
-                                  //       decoration: BoxDecoration(
-                                  //         color: Colors.white.withOpacity(0.2),
-                                  //         borderRadius: BorderRadius.circular(12),
-                                  //       ),
-                                  //       child: IconButton(
-                                  //         icon: Icon(
-                                  //           Icons.logout,
-                                  //           color: Colors.white,
-                                  //           size: 22,
-                                  //         ),
-                                  //         onPressed: () {
-                                  //           // Show confirmation dialog
-                                  //           showDialog(
-                                  //             context: context,
-                                  //             builder: (BuildContext context) {
-                                  //               return AlertDialog(
-                                  //                 title: Text('Logout'),
-                                  //                 content: Text('Are you sure you want to logout?'),
-                                  //                 actions: [
-                                  //                   TextButton(
-                                  //                     onPressed: () {
-                                  //                       Navigator.pop(context); // Close dialog
-                                  //                     },
-                                  //                     child: Text('Cancel'),
-                                  //                   ),
-                                  //                   TextButton(
-                                  //                     onPressed: () {
-                                  //                       Navigator.pop(context); // Close dialog
-                                  //                       // Navigate to login page and remove all previous routes
-                                  //                       Navigator.pushNamedAndRemoveUntil(
-                                  //                         context,
-                                  //                         '/login', // Replace with your login route name
-                                  //                             (route) => false,
-                                  //                       );
-                                  //                     },
-                                  //                     child: Text(
-                                  //                       'Logout',
-                                  //                       style: TextStyle(color: Colors.red),
-                                  //                     ),
-                                  //                   ),
-                                  //                 ],
-                                  //               );
-                                  //             },
-                                  //           );        },
-                                  //         tooltip: 'Logout',
-                                  //       ),
-                                  //     ),
-                                  //   ],
-                                  // );
                                 },
                                 tooltip: 'Logout',
                               ),
                             ],
                           ),
                         ],
-                      ),
-                      SizedBox(height: 8),
-
-                      // User Info Card
-                      Container(
-                        padding: EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 10,
-                              offset: Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            // Container(
-                            //   width: 60,
-                            //   height: 60,
-                            //   decoration: BoxDecoration(
-                            //     shape: BoxShape.circle,
-                            //     gradient: LinearGradient(
-                            //       colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
-                            //     ),
-                            //   ),
-                            //   child: Icon(
-                            //     Icons.person,
-                            //     color: Colors.white,
-                            //     size: 32,
-                            //   ),
-                            // ),
-                            // SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Hello, Muhammad',
-                                    style: TextStyle(
-                                      color: Color(0xFF2C3E50),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  // SizedBox(height: 4),
-                                  // Text(
-                                  //   'Welcome back, work safe..',
-                                  //   style: TextStyle(
-                                  //     color: Color(0xFF7F8C8D),
-                                  //     fontSize: 13,
-                                  //   ),
-                                  // ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
 
                       SizedBox(height: 24),

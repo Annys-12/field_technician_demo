@@ -26,6 +26,7 @@ class CompletedTaskPM extends StatefulWidget {
   */
 
   final int selectedIndex;
+  final bool isFromCompletedTask;
 
   const CompletedTaskPM({
     super.key,
@@ -58,6 +59,7 @@ class CompletedTaskPM extends StatefulWidget {
     this.endTime = '18-08-2025 15:40:00',
     */
     required this.selectedIndex,
+    this.isFromCompletedTask = false,
   });
 
   @override
@@ -122,7 +124,18 @@ class _CompletedTaskPMState extends State<CompletedTaskPM> {
                           IconButton(
                             icon: const Icon(Icons.arrow_back_ios_new,
                                 color: Colors.white, size: 20),
-                            onPressed: () => Navigator.pop(context),
+                            onPressed: () {
+                              if (widget.isFromCompletedTask) {
+                                // If coming from completed task, pop only once
+                                Navigator.pop(context);
+                              } else {
+                                // If coming from submit flow, pop 4 times
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                              }
+                            },
                           ),
                           const SizedBox(width: 8),
                           Expanded(
@@ -243,42 +256,6 @@ class _CompletedTaskPMState extends State<CompletedTaskPM> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Completed Badge
-                    // Center(
-                    //   child: Container(
-                    //     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    //     decoration: BoxDecoration(
-                    //       gradient: const LinearGradient(
-                    //         colors: [Color(0xFF27AE60), Color(0xFF2ECC71)],
-                    //       ),
-                    //       borderRadius: BorderRadius.circular(30),
-                    //       boxShadow: [
-                    //         BoxShadow(
-                    //           color: const Color(0xFF27AE60).withOpacity(0.3),
-                    //           blurRadius: 8,
-                    //           offset: const Offset(0, 4),
-                    //         ),
-                    //       ],
-                    //     ),
-                    //     child: const Row(
-                    //       mainAxisSize: MainAxisSize.min,
-                    //       children: [
-                    //         Icon(Icons.check_circle, color: Colors.white, size: 20),
-                    //         SizedBox(width: 8),
-                    //         Text(
-                    //           'Task Completed',
-                    //           style: TextStyle(
-                    //             color: Colors.white,
-                    //             fontWeight: FontWeight.w600,
-                    //             fontSize: 15,
-                    //           ),
-                    //         ),
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ),
-
-                    // Task Details Card
                     _buildModernCard(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

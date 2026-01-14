@@ -501,6 +501,8 @@ class _SwoChecklistPMState extends State<SwoChecklistPM> {
                                     swoNumber: widget.subtaskNumber,
                                     taskType: widget.taskType,
                                     spareParts: myTask[widget.selectedIndex].spareParts,
+                                    selectedIndex: widget.selectedIndex,
+                                    saveTasks: widget.saveTasks,
                                     /*
                                     spareParts: [
                                       {
