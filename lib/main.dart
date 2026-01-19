@@ -612,17 +612,23 @@
 import 'dart:convert';
 
 import 'package:field_technician_demo/ui/data_model/task_model.dart';
+import 'package:field_technician_demo/ui/screen13_notifications_service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../ui/screen01_login.dart';
 import '../ui/screen02_dashboard.dart';
 import '../ui/screen03_outbox_service.dart';
 import '../ui/screen03_pending_task.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
 import 'app_data.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Initialize timezone
+  tz.initializeTimeZones();
 
+  // Initialize notifications
+  await NotificationService().initialize();
   // Start auto-sync service
   final outboxService = OutboxService();
   outboxService.startAutoSync();

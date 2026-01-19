@@ -1417,6 +1417,7 @@ import 'package:field_technician_demo/ui/screen09_breakdown_notes.dart';
 import 'package:field_technician_demo/ui/screen10_service_checklist.dart';
 import 'package:field_technician_demo/ui/screen12_rental_details.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -1659,23 +1660,14 @@ class _SwoChecklistBDState extends State<SwoChecklistBD> {
   }
 
   void _showToast(String message, {required bool isError}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              isError ? Icons.error_outline : Icons.check_circle_outline,
-              color: Colors.white,
-            ),
-            const SizedBox(width: 12),
-            Expanded(child: Text(message)),
-          ],
-        ),
-        backgroundColor: isError ? const Color(0xFFE74C3C) : const Color(0xFF27AE60),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        duration: const Duration(seconds: 2),
-      ),
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 2,
+      backgroundColor: isError ? const Color(0xFFE74C3C) : const Color(0xFF27AE60),
+      textColor: Colors.white,
+      fontSize: 16.0,
     );
   }
 

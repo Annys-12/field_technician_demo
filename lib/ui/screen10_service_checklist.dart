@@ -162,8 +162,8 @@ class _ServiceChecklistScreenState extends State<ServiceChecklistScreen> {
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        onTap: () {
-                          Navigator.push(
+                        onTap: () async {
+                          final result = await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => SubtaskServiceChecklist(
@@ -173,6 +173,16 @@ class _ServiceChecklistScreenState extends State<ServiceChecklistScreen> {
                               ),
                             ),
                           );
+
+                          // If subtask was completed, check if all subtasks are done
+                          if (result == 'completed') {
+                            // Check if all subtasks are completed
+                            if (allSubtasksCompleted) {
+                              // Navigate back to PM page with completion status
+                              Navigator.pop(context, true);
+                            }
+                            // If not all completed, stay on this screen (do nothing)
+                          }
                         },
                         borderRadius: BorderRadius.circular(16),
                         child: Container(

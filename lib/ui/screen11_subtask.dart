@@ -258,8 +258,8 @@ class _SubtaskServiceChecklistState extends State<SubtaskServiceChecklist> {
                           ),
                         );
 
-                        // Navigate back
-                        Navigator.pop(context);
+                        // Navigate back with completion signal
+                        Navigator.pop(context, 'completed');
                       }
                           : null,
                       child: const Text(

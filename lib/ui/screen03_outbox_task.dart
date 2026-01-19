@@ -225,6 +225,7 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'components/card_outbox_task.dart';
 import '../app_data.dart';
@@ -478,15 +479,16 @@ class _OutboxScreenState extends State<OutboxScreen> {
       _isSyncing = false;
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          failCount == 0
-              ? "All tasks synced successfully!"
-              : "$successCount synced, $failCount failed",
-        ),
-        backgroundColor: failCount == 0 ? Colors.green : Colors.orange,
-      ),
+    Fluttertoast.showToast(
+      msg: failCount == 0
+          ? "All tasks synced successfully!"
+          : "$successCount synced, $failCount failed",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 2,
+      backgroundColor: failCount == 0 ? Colors.green : Colors.orange,
+      textColor: Colors.white,
+      fontSize: 16.0,
     );
   }
 

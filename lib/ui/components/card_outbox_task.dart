@@ -13,7 +13,7 @@ class CardOutbox extends StatefulWidget {
   final String status; // 'pending_upload', 'uploading', 'failed'
   final DateTime savedAt;
   final String? errorMessage;
-  final Function(String swoNumber)? onRetryUpload; // Add callback for retry
+  final Function(String swoNumber)? onRetryUpload;
 
   const CardOutbox({
     super.key,
